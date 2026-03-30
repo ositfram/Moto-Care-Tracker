@@ -2,40 +2,52 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moto-Care Tracker | Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Moto-Care Pro | Cloud Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        :root {
-            --bg-color: #0f1215; --card-bg: #1c2227; --primary: #00ffa3;
-            --accent-red: #ff3d71; --text-main: #ffffff; --text-dim: #9da5b1;
+        :root { 
+            --bg-color: #0f1215; --card-bg: #1c2227; --primary: #00ffa3; 
+            --accent-red: #ff3d71; --text-main: #ffffff; --text-dim: #9da5b1; 
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: sans-serif; margin: 0; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 450px; padding: 15px; min-height: 100vh; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
+        .app-container { width: 100%; max-width: 450px; padding: 15px; min-height: 100vh; position: relative; }
+        
+        /* প্রোফাইল */
         .profile-header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #2d363f; }
         .bike-info h2 { margin: 0; font-size: 18px; color: var(--primary); }
-        .bike-info p { margin: 5px 0 0; font-size: 12px; color: var(--text-dim); }
-        .settings-btn { background: #2d363f; border: none; color: white; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; }
-        .odo-section { background: linear-gradient(145deg, #1c2227, #13181c); padding: 25px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; }
-        .odo-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .bike-info p { margin: 5px 0 0; font-size: 11px; color: var(--text-dim); }
+        
+        .settings-btn { background: #2d363f; border: none; color: white; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* অডোমিটার */
+        .odo-section { background: linear-gradient(145deg, #1c2227, #13181c); padding: 25px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; position: relative; }
+        .odo-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
         .odo-display { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-        .odo-display h1 { font-size: 42px; margin: 0; font-family: monospace; letter-spacing: 2px; }
-        .drive-btn { width: 100%; padding: 18px; border-radius: 15px; border: none; background: linear-gradient(90deg, #00ffa3, #00d1ff); font-size: 18px; font-weight: bold; color: #000; cursor: pointer; box-shadow: 0 10px 20px rgba(0, 255, 163, 0.2); transition: 0.3s; }
-        .drive-btn.active { background: var(--accent-red); color: white; }
-        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .card { background: var(--card-bg); padding: 20px 15px; border-radius: 20px; text-align: center; border: 1px solid #2d363f; }
-        .card i { font-size: 24px; color: var(--primary); }
-        .card h3 { font-size: 13px; margin: 10px 0; color: var(--text-dim); }
-        .card .val { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-        .progress-bg { background: #2d363f; height: 6px; border-radius: 10px; overflow: hidden; }
-        .bar { height: 100%; background: var(--primary); transition: 0.5s; }
-        .reset-link { font-size: 10px; color: var(--primary); background: none; border: none; text-decoration: underline; margin-top: 10px; cursor: pointer; }
+        .odo-display h1 { font-size: 44px; margin: 0; font-family: 'Courier New', monospace; font-weight: bold; }
+
+        /* ড্রাইভ বাটন */
+        .main-action { margin-bottom: 25px; }
+        .drive-btn { width: 100%; padding: 18px; border-radius: 15px; border: none; background: linear-gradient(90deg, #00ffa3, #00d1ff); font-size: 18px; font-weight: bold; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 20px rgba(0, 255, 163, 0.2); transition: 0.3s; }
+        .drive-btn.active { background: var(--accent-red); color: white; box-shadow: 0 10px 20px rgba(255, 61, 113, 0.2); }
+
+        /* কার্ডস */
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card { background: var(--card-bg); padding: 18px 12px; border-radius: 20px; text-align: center; border: 1px solid #2d363f; position: relative; }
+        .card i { font-size: 22px; color: var(--primary); margin-bottom: 8px; }
+        .card .val { font-size: 18px; font-weight: bold; margin: 8px 0; }
+        .bar-bg { background: #2d363f; height: 6px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .bar { height: 100%; background: var(--primary); transition: 0.5s; width: 0%; }
+        .reset-link { font-size: 10px; color: var(--primary); background: none; border: none; text-decoration: underline; cursor: pointer; margin-top: 5px; }
+
+        /* মডাল */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: var(--card-bg); padding: 25px; border-radius: 25px; width: 100%; max-width: 350px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #2d363f; border: 1px solid #3d4752; border-radius: 10px; color: white; }
-        .save-btn { width: 100%; padding: 12px; background: var(--primary); border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .modal-content h3 { margin: 0 0 15px; color: var(--primary); }
+        input { width: 100%; padding: 12px; margin: 8px 0; background: #2d363f; border: 1px solid #3d4752; border-radius: 10px; color: white; }
+        .save-btn { width: 100%; padding: 12px; background: var(--primary); border: none; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -43,89 +55,153 @@
 <div class="app-container">
     <header class="profile-header">
         <div class="bike-info">
-            <h2 id="bikeName">My Bike</h2>
-            <p id="bikeMeta">Model: -- | No: --</p>
+            <h2 id="bikeName">লোড হচ্ছে...</h2>
+            <p id="bikeMeta">Cloud সিঙ্ক্রোনাইজ করা হচ্ছে...</p>
         </div>
         <button class="settings-btn" onclick="toggleModal('profileModal')"><i class="fas fa-motorcycle"></i></button>
     </header>
 
     <section class="odo-section">
-        <div class="odo-label">Total Odometer (KM)</div>
+        <div class="odo-label">মোট অডোমিটার রিডিং (KM)</div>
         <div class="odo-display">
             <h1 id="mainOdo">0.0</h1>
             <button class="settings-btn" style="width:30px; height:30px; font-size:12px;" onclick="editOdo()"><i class="fas fa-edit"></i></button>
         </div>
     </section>
 
-    <button id="trackBtn" class="drive-btn" onclick="toggleTracking()">
-        <i class="fas fa-play"></i> রাইড শুরু করুন
-    </button>
+    <div class="main-action">
+        <button id="trackBtn" class="drive-btn" onclick="toggleTracking()">
+            <i class="fas fa-play"></i> রাইড শুরু করুন
+        </button>
+    </div>
 
-    <div class="status-grid">
+    <section class="status-grid">
         <div class="card">
             <i class="fas fa-gas-pump"></i>
-            <h3>Fuel Reminder</h3>
-            <div class="val"><span id="fuelRemaining">0</span> KM</div>
-            <div class="progress-bg"><div id="fuelBar" class="bar" style="width: 100%"></div></div>
-            <button class="reset-link" onclick="resetService('fuel')">Refilled Tank</button>
+            <div style="font-size:12px; color:var(--text-dim);">ফুয়েল রেঞ্জ</div>
+            <div class="val" id="fuelRemaining">0 KM</div>
+            <div class="bar-bg"><div id="fuelBar" class="bar"></div></div>
+            <button class="reset-link" onclick="resetService('fuel')">তেল ভরেছি</button>
         </div>
         <div class="card">
             <i class="fas fa-oil-can"></i>
-            <h3>Engine Oil</h3>
-            <div class="val"><span id="oilRemaining">0</span> KM</div>
-            <div class="progress-bg"><div id="oilBar" class="bar" style="width: 100%"></div></div>
-            <button class="reset-link" onclick="resetService('oil')">Changed Oil</button>
+            <div style="font-size:12px; color:var(--text-dim);">ইঞ্জিন অয়েল</div>
+            <div class="val" id="oilRemaining">0 KM</div>
+            <div class="bar-bg"><div id="oilBar" class="bar"></div></div>
+            <button class="reset-link" onclick="resetService('oil')">অয়েল বদলেছি</button>
         </div>
-    </div>
+    </section>
 </div>
 
 <div id="profileModal" class="modal">
     <div class="modal-content">
-        <h3>Motorcycle Setup</h3>
-        <input type="text" id="inName" placeholder="মোটরের নাম">
+        <h3>Cloud সেটাআপ</h3>
+        <input type="text" id="inName" placeholder="বাইকের নাম">
         <input type="text" id="inModel" placeholder="মডেল">
         <input type="text" id="inPlate" placeholder="নাম্বার প্লেট">
-        <input type="number" id="inFuelLimit" placeholder="ফুয়েল লিমিট (যেমন ১৫০ কিমি)">
-        <input type="number" id="inOilLimit" placeholder="অয়েল লিমিট (যেমন ২০০০ কিমি)">
-        <button class="save-btn" onclick="saveData()">Save & Close</button>
+        <input type="number" id="inFuelLimit" placeholder="ফুয়েল লিমিট (KM)">
+        <input type="number" id="inOilLimit" placeholder="অয়েল লিমিট (KM)">
+        <button class="save-btn" onclick="saveToCloud()">সেভ করুন</button>
+        <button class="reset-link" style="display:block; margin: 15px auto 0;" onclick="toggleModal('profileModal')">বন্ধ করুন</button>
     </div>
 </div>
 
-<script>
-    let data = JSON.parse(localStorage.getItem('motoData')) || {
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBYP2X8KQaF-1S7IpMqSdQ6DKAbGZMoags",
+        authDomain: "moto-care-pro.firebaseapp.com",
+        projectId: "moto-care-pro",
+        storageBucket: "moto-care-pro.firebasestorage.app",
+        messagingSenderId: "621207883659",
+        appId: "1:621207883659:web:e1ba58f7aec638c5dca98e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const userDoc = doc(db, "users", "farhad_bike");
+
+    let bikeData = {
         bikeName: "My Bike", model: "--", plate: "--",
         totalOdo: 0.0, fuelLimit: 150, oilLimit: 2000,
         lastFuelOdo: 0, lastOilOdo: 0, isTracking: false
     };
 
-    let watchId = null;
-    let lastPos = null;
+    // ক্লাউড থেকে ডাটা লোড
+    async function loadData() {
+        try {
+            const docSnap = await getDoc(userDoc);
+            if (docSnap.exists()) {
+                bikeData = docSnap.data();
+                updateUI();
+            } else {
+                saveToCloud();
+            }
+        } catch (e) { console.error("Data Load Error:", e); }
+    }
 
     function updateUI() {
-        document.getElementById('bikeName').innerText = data.bikeName;
-        document.getElementById('bikeMeta').innerText = `Model: ${data.model} | No: ${data.plate}`;
-        document.getElementById('mainOdo').innerText = data.totalOdo.toFixed(1);
+        document.getElementById('bikeName').innerText = bikeData.bikeName;
+        document.getElementById('bikeMeta').innerText = `Model: ${bikeData.model} | No: ${bikeData.plate}`;
+        document.getElementById('mainOdo').innerText = bikeData.totalOdo.toFixed(1);
         
-        let fuelUsed = data.totalOdo - data.lastFuelOdo;
-        let fuelLeft = Math.max(0, data.fuelLimit - fuelUsed);
-        document.getElementById('fuelRemaining').innerText = fuelLeft.toFixed(1);
-        document.getElementById('fuelBar').style.width = (fuelLeft/data.fuelLimit*100) + "%";
+        // ফুয়েল ক্যালকুলেশন
+        let fUsed = bikeData.totalOdo - bikeData.lastFuelOdo;
+        let fLeft = Math.max(0, bikeData.fuelLimit - fUsed);
+        document.getElementById('fuelRemaining').innerText = fLeft.toFixed(1) + " KM";
+        document.getElementById('fuelBar').style.width = (fLeft / bikeData.fuelLimit * 100) + "%";
 
-        let oilUsed = data.totalOdo - data.lastOilOdo;
-        let oilLeft = Math.max(0, data.oilLimit - oilUsed);
-        document.getElementById('oilRemaining').innerText = oilLeft.toFixed(1);
-        document.getElementById('oilBar').style.width = (oilLeft/data.oilLimit*100) + "%";
+        // অয়েল ক্যালকুলেশন
+        let oUsed = bikeData.totalOdo - bikeData.lastOilOdo;
+        let oLeft = Math.max(0, bikeData.oilLimit - oUsed);
+        document.getElementById('oilRemaining').innerText = oLeft.toFixed(1) + " KM";
+        document.getElementById('oilBar').style.width = (oLeft / bikeData.oilLimit * 100) + "%";
 
-        // রিমাইন্ডার লজিক
-        if(fuelLeft <= 10 && fuelLeft > 0) {
-            if(Math.floor(fuelLeft) % 5 === 0) alert("সাবধান! আর মাত্র " + fuelLeft.toFixed(1) + " কিমি ফুয়েল বাকি।");
+        // স্মার্ট রিমাইন্ডার (১৪০ কিমি পার হলে)
+        if (fLeft <= 10 && fLeft > 0) {
+            if (Math.round(fLeft * 10) % 50 === 0) { // প্রতি ৫ কিমি অন্তর
+                if ("vibrate" in navigator) navigator.vibrate([500, 200, 500]);
+            }
         }
     }
 
-    function toggleTracking() {
-        data.isTracking = !data.isTracking;
+    // গ্লোবাল ফাংশনগুলো উইন্ডোতে সেট করা
+    window.saveToCloud = async function() {
+        bikeData.bikeName = document.getElementById('inName').value || bikeData.bikeName;
+        bikeData.model = document.getElementById('inModel').value || bikeData.model;
+        bikeData.plate = document.getElementById('inPlate').value || bikeData.plate;
+        bikeData.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || bikeData.fuelLimit;
+        bikeData.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || bikeData.oilLimit;
+        
+        await setDoc(userDoc, bikeData);
+        toggleModal('profileModal');
+        updateUI();
+    };
+
+    window.resetService = async function(type) {
+        if(confirm("আপনি কি নিশ্চিত?")) {
+            if(type === 'fuel') bikeData.lastFuelOdo = bikeData.totalOdo;
+            else bikeData.lastOilOdo = bikeData.totalOdo;
+            await setDoc(userDoc, bikeData);
+            updateUI();
+        }
+    };
+
+    window.editOdo = async function() {
+        let n = prompt("সঠিক অডোমিটার রিডিং দিন (KM):", bikeData.totalOdo);
+        if(n) { bikeData.totalOdo = parseFloat(n); await setDoc(userDoc, bikeData); updateUI(); }
+    };
+
+    // GPS এবং ট্র্যাকিং
+    let watchId = null;
+    let idleTimer = null;
+
+    window.toggleTracking = function() {
+        bikeData.isTracking = !bikeData.isTracking;
         const btn = document.getElementById('trackBtn');
-        if(data.isTracking) {
+        if(bikeData.isTracking) {
             btn.innerHTML = '<i class="fas fa-stop"></i> রাইড বন্ধ করুন';
             btn.classList.add('active');
             startGps();
@@ -133,72 +209,52 @@
             btn.innerHTML = '<i class="fas fa-play"></i> রাইড শুরু করুন';
             btn.classList.remove('active');
             navigator.geolocation.clearWatch(watchId);
+            clearTimeout(idleTimer);
+            setDoc(userDoc, bikeData);
         }
-        saveToLocal();
-    }
+    };
 
     function startGps() {
-        if ("geolocation" in navigator) {
-            watchId = navigator.geolocation.watchPosition(pos => {
-                if(!lastPos) { lastPos = pos.coords; return; }
-                
-                let dist = calculateDistance(lastPos.latitude, lastPos.longitude, pos.coords.latitude, pos.coords.longitude);
-                
-                // স্পিড ফিল্টার: যদি গতি ৫০০ মিটার/ঘন্টা (০.৫ কিমি/ঘন্টা) এর বেশি হয়
-                if(pos.coords.speed * 3.6 > 0.5 || dist > 0.01) {
-                    data.totalOdo += dist;
-                    updateUI();
-                    saveToLocal();
+        let lastPos = null;
+        watchId = navigator.geolocation.watchPosition(pos => {
+            // আইডল টাইম রিসেট (নড়াচড়া করলে সময় বাড়বে)
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                if(bikeData.isTracking) {
+                    toggleTracking();
+                    alert("আপনি ৫ মিনিট স্থির আছেন, তাই ট্র্যাকিং বন্ধ করা হলো।");
                 }
-                lastPos = pos.coords;
-            }, err => console.error(err), { enableHighAccuracy: true });
-        }
+            }, 300000); // ৫ মিনিট
+
+            if(!lastPos) { lastPos = pos.coords; return; }
+            
+            let dist = calculateDistance(lastPos.latitude, lastPos.longitude, pos.coords.latitude, pos.coords.longitude);
+            
+            // স্পিড ফিল্টার (০.৫ কিমি/ঘণ্টার বেশি হলে)
+            if(pos.coords.speed * 3.6 > 0.5 || dist > 0.01) {
+                bikeData.totalOdo += dist;
+                updateUI();
+                // প্রতি ১ কিমি পর পর ক্লাউডে অটো-সেভ
+                if(Math.floor(bikeData.totalOdo) % 1 === 0) setDoc(userDoc, bikeData);
+            }
+            lastPos = pos.coords;
+        }, null, { enableHighAccuracy: true });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // Earth Radius in KM
+        const R = 6371;
         const dLat = (lat2-lat1) * Math.PI / 180;
         const dLon = (lon2-lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    function resetService(type) {
-        if(type === 'fuel') data.lastFuelOdo = data.totalOdo;
-        else data.lastOilOdo = data.totalOdo;
-        updateUI(); saveToLocal();
-    }
-
-    function editOdo() {
-        let n = prompt("সঠিক অডোমিটার রিডিং দিন:", data.totalOdo);
-        if(n) { data.totalOdo = parseFloat(n); updateUI(); saveToLocal(); }
-    }
-
-    function toggleModal(id) {
+    window.toggleModal = (id) => {
         const m = document.getElementById(id);
         m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-    }
+    };
 
-    function saveData() {
-        data.bikeName = document.getElementById('inName').value || data.bikeName;
-        data.model = document.getElementById('inModel').value || data.model;
-        data.plate = document.getElementById('inPlate').value || data.plate;
-        data.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || data.fuelLimit;
-        data.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || data.oilLimit;
-        toggleModal('profileModal'); updateUI(); saveToLocal();
-    }
-
-    function saveToLocal() { localStorage.setItem('motoData', JSON.stringify(data)); }
-    
-    window.onload = updateUI;
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-    .then(() => console.log("Service Worker Registered"))
-    .catch(err => console.log("SW Register Failed", err));
-}
-
+    window.onload = loadData;
 </script>
 
 </body>
