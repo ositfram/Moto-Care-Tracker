@@ -19,39 +19,49 @@
         /* Auth Screen */
         #authScreen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         .auth-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 1px solid #2d363f; text-align: center; }
-        
-        /* input ও tel ইনপুট স্টাইল */
         input, .iti { width: 100% !important; margin: 8px 0; }
         input { padding: 14px; background: #2d363f; border: 1px solid #3d4752; border-radius: 12px; color: white; font-size: 15px; }
-        .iti__single-country { color: #000; } /* দেশের লিস্টের টেক্সট কালো রাখার জন্য */
+
+        /* Main App Dashboard */
+        #mainApp { display: none; padding: 15px; max-width: 450px; margin: auto; min-height: 100vh; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #2d363f; }
+        .header h2 { margin: 0; font-size: 18px; color: var(--primary); }
+        .header p { margin: 4px 0 0; font-size: 11px; color: var(--text-dim); }
+
+        .settings-btn { background: #2d363f; border: none; color: white; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        .odo-section { background: linear-gradient(145deg, #1c2227, #13181c); padding: 25px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; position: relative; }
+        .odo-display { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+        .odo-display h1 { font-size: 44px; margin: 0; font-family: 'Courier New', monospace; font-weight: bold; }
 
         .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 16px; }
-        .btn-primary { background: linear-gradient(90deg, #00ffa3, #00d1ff); color: #000; }
-        .btn-outline { background: none; border: 1px solid var(--primary); color: var(--primary); font-size: 14px; }
+        .btn-primary { background: linear-gradient(90deg, #00ffa3, #00d1ff); color: #000; box-shadow: 0 8px 20px rgba(0, 255, 163, 0.2); }
+        .btn-outline { background: none; border: 1px solid var(--primary); color: var(--primary); font-size: 13px; }
+        .btn-stop { background: var(--accent-red); color: white; }
 
-        /* Dashboard Styles */
-        #mainApp { display: none; padding: 15px; max-width: 500px; margin: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px; border-radius: 20px; border: 1px solid #2d363f; margin-bottom: 20px; }
-        .odo-box { background: #1c2227; padding: 30px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .card { background: var(--card-bg); padding: 20px 15px; border-radius: 22px; text-align: center; border: 1px solid #2d363f; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .card { background: var(--card-bg); padding: 18px 12px; border-radius: 20px; text-align: center; border: 1px solid #2d363f; position: relative; }
+        .card i { font-size: 22px; color: var(--primary); margin-bottom: 8px; }
+        .bar-bg { background: #2d363f; height: 6px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .bar { height: 100%; background: var(--primary); transition: 0.5s; width: 0%; }
+
+        /* Modal Settings */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 25px; width: 100%; max-width: 380px; }
     </style>
 </head>
 <body>
 
     <section id="authScreen">
         <div class="auth-card">
-            <i class="fas fa-motorcycle" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
+            <i class="fas fa-motorcycle" style="font-size: 45px; color: var(--primary); margin-bottom: 15px;"></i>
             <h2 id="authTitle" style="color:var(--primary)">Sign In</h2>
-            
             <div id="regFields" style="display: none;">
                 <input type="text" id="userName" placeholder="Full Name">
                 <input type="tel" id="userPhone">
             </div>
-            
             <input type="email" id="userEmail" placeholder="Email Address">
             <input type="password" id="userPass" placeholder="Password (min 6 chars)">
-            
             <button class="btn btn-primary" id="authBtn" onclick="handleAuth()">Login</button>
             <button class="btn btn-outline" id="toggleAuth" onclick="toggleAuthMode()">Create New Account</button>
         </div>
@@ -59,15 +69,58 @@
 
     <section id="mainApp">
         <header class="header">
-            <div><h2 id="dispName">Welcome</h2><p id="dispBike">Checking setup...</p></div>
-            <button onclick="logout()" style="background:#2d363f; border:none; color:white; padding:10px; border-radius:10px;"><i class="fas fa-sign-out-alt"></i></button>
+            <div>
+                <h2 id="dispUserName">Hello, User</h2>
+                <p id="dispBike">Bike Info Loading...</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="settings-btn" onclick="toggleModal('setupModal')"><i class="fas fa-motorcycle"></i></button>
+                <button class="settings-btn" style="background:var(--accent-red)" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
         </header>
-        <section class="odo-box"><span>Total Odometer</span><h1 id="mainOdo" style="font-size:45px; margin:10px 0;">0.0</h1></section>
-        <button id="trackBtn" class="btn btn-primary" onclick="toggleTracking()"><i class="fas fa-play"></i> Start Ride</button>
+
+        <section class="odo-section">
+            <div style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Total Odometer</div>
+            <div class="odo-display">
+                <h1 id="mainOdo">0.0</h1>
+                <button class="settings-btn" style="width:30px; height:30px; font-size:12px;" onclick="editOdo()"><i class="fas fa-edit"></i></button>
+            </div>
+        </section>
+
+        <button id="trackBtn" class="btn btn-primary" onclick="toggleTracking()">
+            <i class="fas fa-play"></i> Start Ride
+        </button>
+
+        <div class="grid">
+            <div class="card">
+                <i class="fas fa-gas-pump"></i>
+                <div style="font-size:12px;">Fuel Range</div>
+                <div class="val" id="fuelVal" style="font-weight:bold; margin:5px 0;">0 KM</div>
+                <div class="bar-bg"><div id="fuelBar" class="bar"></div></div>
+                <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('fuel')">Refilled</button>
+            </div>
+            <div class="card">
+                <i class="fas fa-oil-can"></i>
+                <div style="font-size:12px;">Engine Oil</div>
+                <div class="val" id="oilVal" style="font-weight:bold; margin:5px 0;">0 KM</div>
+                <div class="bar-bg"><div id="oilBar" class="bar"></div></div>
+                <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('oil')">Changed</button>
+            </div>
+        </div>
     </section>
 
+    <div id="setupModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:var(--primary); margin-top:0;">Bike Configuration</h3>
+            <input type="text" id="inBikeName" placeholder="Bike Name & Model">
+            <input type="number" id="inFuelLimit" placeholder="Fuel Limit (e.g. 150 KM)">
+            <input type="number" id="inOilLimit" placeholder="Oil Limit (e.g. 2000 KM)">
+            <button class="btn btn-primary" onclick="saveBikeSetup()">Save Cloud Setup</button>
+            <button class="btn btn-outline" onclick="toggleModal('setupModal')">Close</button>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
-    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -86,18 +139,17 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Phone Input Initialization
+        // Phone Input
         const phoneInput = document.querySelector("#userPhone");
         const iti = window.intlTelInput(phoneInput, {
             initialCountry: "auto",
-            geoIpLookup: function(success, failure) {
-                fetch("https://ipapi.co/json").then(res => res.json()).then(data => success(data.country_code)).catch(() => success("MY"));
-            },
+            geoIpLookup: success => fetch("https://ipapi.co/json").then(res => res.json()).then(data => success(data.country_code)).catch(() => success("MY")),
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
         });
 
         let isLoginMode = true;
         let currentUser = null;
+        let bikeData = { totalOdo: 0.0, fuelLimit: 150, oilLimit: 2000, lastFuelOdo: 0, lastOilOdo: 0, bikeName: "My Bike" };
 
         window.toggleAuthMode = () => {
             isLoginMode = !isLoginMode;
@@ -109,37 +161,100 @@
         window.handleAuth = async () => {
             const email = document.getElementById('userEmail').value;
             const pass = document.getElementById('userPass').value;
-            
-            if (isLoginMode) {
-                try { await signInWithEmailAndPassword(auth, email, pass); } catch(e) { alert(e.message); }
-            } else {
-                const name = document.getElementById('userName').value;
-                const fullPhone = iti.getNumber(); // এটি কান্ট্রি কোডসহ ফুল নাম্বার দেবে
-                
-                if(!iti.isValidNumber()) return alert("Please enter a valid phone number");
+            if(!email || !pass) return alert("Enter details");
 
-                try {
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } else {
+                    const name = document.getElementById('userName').value;
+                    const phone = iti.getNumber();
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    await setDoc(doc(db, "users", res.user.uid), {
-                        name: name, phone: fullPhone, email: email,
-                        bikeData: { totalOdo: 0, fuelLimit: 150, oilLimit: 2000, lastFuelOdo: 0, lastOilOdo: 0, bikeName: "" }
-                    });
-                } catch(e) { alert(e.message); }
-            }
+                    await setDoc(doc(db, "users", res.user.uid), { name, phone, email, bikeData });
+                }
+            } catch (err) { alert(err.message); }
         };
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async user => {
             if (user) {
                 currentUser = user;
                 document.getElementById('authScreen').style.display = "none";
                 document.getElementById('mainApp').style.display = "block";
-                // Load data logic...
+                loadData();
             } else {
                 document.getElementById('authScreen').style.display = "flex";
                 document.getElementById('mainApp').style.display = "none";
             }
         });
 
+        async function loadData() {
+            const d = await getDoc(doc(db, "users", currentUser.uid));
+            if (d.exists()) {
+                const data = d.data();
+                document.getElementById('dispUserName').innerText = "Hi, " + data.name;
+                bikeData = data.bikeData;
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('mainOdo').innerText = bikeData.totalOdo.toFixed(1);
+            document.getElementById('dispBike').innerText = bikeData.bikeName;
+            
+            let fLeft = Math.max(0, bikeData.fuelLimit - (bikeData.totalOdo - bikeData.lastFuelOdo));
+            document.getElementById('fuelVal').innerText = fLeft.toFixed(1) + " KM";
+            document.getElementById('fuelBar').style.width = (fLeft/bikeData.fuelLimit*100) + "%";
+
+            let oLeft = Math.max(0, bikeData.oilLimit - (bikeData.totalOdo - bikeData.lastOilOdo));
+            document.getElementById('oilVal').innerText = oLeft.toFixed(1) + " KM";
+            document.getElementById('oilBar').style.width = (oLeft/bikeData.oilLimit*100) + "%";
+        }
+
+        window.saveBikeSetup = async () => {
+            bikeData.bikeName = document.getElementById('inBikeName').value || bikeData.bikeName;
+            bikeData.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || bikeData.fuelLimit;
+            bikeData.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || bikeData.oilLimit;
+            await updateDoc(doc(db, "users", currentUser.uid), { bikeData });
+            toggleModal('setupModal');
+            updateUI();
+        };
+
+        window.editOdo = async () => {
+            let n = prompt("Set Odometer (KM):", bikeData.totalOdo);
+            if(n) { bikeData.totalOdo = parseFloat(n); await updateDoc(doc(db, "users", currentUser.uid), { bikeData }); updateUI(); }
+        };
+
+        window.resetTask = async (type) => {
+            if(confirm("Confirm reset?")) {
+                if(type==='fuel') bikeData.lastFuelOdo = bikeData.totalOdo;
+                else bikeData.lastOilOdo = bikeData.totalOdo;
+                await updateDoc(doc(db, "users", currentUser.uid), { bikeData });
+                updateUI();
+            }
+        };
+
+        let watchId = null;
+        window.toggleTracking = () => {
+            const btn = document.getElementById('trackBtn');
+            if(btn.innerText.includes("Start")) {
+                btn.innerHTML = '<i class="fas fa-stop"></i> Stop Ride';
+                btn.classList.add('btn-stop');
+                watchId = navigator.geolocation.watchPosition(pos => {
+                    bikeData.totalOdo += 0.01; // জিপিএস লজিক এখানে থাকবে
+                    updateUI();
+                }, null, { enableHighAccuracy: true });
+            } else {
+                btn.innerHTML = '<i class="fas fa-play"></i> Start Ride';
+                btn.classList.remove('btn-stop');
+                navigator.geolocation.clearWatch(watchId);
+                updateDoc(doc(db, "users", currentUser.uid), { bikeData });
+            }
+        };
+
+        window.toggleModal = id => {
+            const m = document.getElementById(id);
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+        };
         window.logout = () => signOut(auth);
     </script>
 </body>
