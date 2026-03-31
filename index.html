@@ -16,11 +16,14 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', sans-serif; margin: 0; }
         
+        /* Auth Screen Design */
         #authScreen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .auth-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 1px solid #2d363f; text-align: center; }
+        .auth-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 1px solid #2d363f; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         input, .iti { width: 100% !important; margin: 8px 0; }
-        input { padding: 14px; background: #2d363f; border: 1px solid #3d4752; border-radius: 12px; color: white; font-size: 15px; }
+        input { padding: 14px; background: #2d363f; border: 1px solid #3d4752; border-radius: 12px; color: white; font-size: 15px; transition: 0.3s; }
+        input:focus { border-color: var(--primary); }
 
+        /* Dashboard Design */
         #mainApp { display: none; padding: 15px; max-width: 450px; margin: auto; min-height: 100vh; }
         .header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #2d363f; }
         .header h2 { margin: 0; font-size: 18px; color: var(--primary); }
@@ -28,21 +31,24 @@
 
         .settings-btn { background: #2d363f; border: none; color: white; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        .odo-section { background: linear-gradient(145deg, #1c2227, #13181c); padding: 25px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; }
+        .odo-section { background: linear-gradient(145deg, #1c2227, #13181c); padding: 25px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .odo-display { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-        .odo-display h1 { font-size: 44px; margin: 0; font-family: 'Courier New', monospace; font-weight: bold; }
+        .odo-display h1 { font-size: 44px; margin: 0; font-family: 'Courier New', monospace; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(0, 255, 163, 0.3); }
 
-        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 16px; }
+        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-primary { background: linear-gradient(90deg, #00ffa3, #00d1ff); color: #000; }
         .btn-outline { background: none; border: 1px solid var(--primary); color: var(--primary); font-size: 13px; }
+        .btn-stop { background: var(--accent-red) !important; color: white !important; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .card { background: var(--card-bg); padding: 18px 12px; border-radius: 20px; text-align: center; border: 1px solid #2d363f; }
+        .card i { font-size: 22px; color: var(--primary); margin-bottom: 8px; }
         .bar-bg { background: #2d363f; height: 6px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-        .bar { height: 100%; background: var(--primary); transition: 0.5s; width: 0%; }
+        .bar { height: 100%; background: var(--primary); transition: 1s ease-in-out; width: 0%; }
 
+        /* Modal Styles */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 25px; width: 100%; max-width: 380px; }
+        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 25px; width: 100%; max-width: 380px; border: 1px solid #2d363f; }
     </style>
 </head>
 <body>
@@ -66,7 +72,7 @@
         <header class="header">
             <div>
                 <h2 id="dispUserName">Hello</h2>
-                <p id="dispBike">No Bike Linked</p>
+                <p id="dispBike">Bike Info Loading...</p>
             </div>
             <div style="display:flex; gap:10px;">
                 <button class="settings-btn" onclick="toggleModal('setupModal')"><i class="fas fa-motorcycle"></i></button>
@@ -75,29 +81,31 @@
         </header>
 
         <section class="odo-section">
-            <div style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Total Odometer</div>
+            <div style="font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;">Total Odometer</div>
             <div class="odo-display">
                 <h1 id="mainOdo">0.0</h1>
                 <button class="settings-btn" style="width:30px; height:30px; font-size:12px;" onclick="editOdo()"><i class="fas fa-edit"></i></button>
             </div>
         </section>
 
-        <button id="trackBtn" class="btn btn-primary" onclick="toggleTracking()"><i class="fas fa-play"></i> Start Ride</button>
+        <button id="trackBtn" class="btn btn-primary" onclick="toggleTracking()">
+            <i class="fas fa-play"></i> Start Ride
+        </button>
 
         <div class="grid">
             <div class="card">
                 <i class="fas fa-gas-pump"></i>
-                <div style="font-size:12px;">Fuel Range</div>
-                <div class="val" id="fuelVal" style="font-weight:bold; margin:5px 0;">0 KM</div>
+                <div style="font-size:12px; color:var(--text-dim)">Fuel Range</div>
+                <div class="val" id="fuelVal" style="font-weight:bold; margin:5px 0; font-size:18px;">0 KM</div>
                 <div class="bar-bg"><div id="fuelBar" class="bar"></div></div>
-                <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('fuel')">Refilled</button>
+                <button class="btn-outline" style="border:none; text-decoration:underline; cursor:pointer;" onclick="resetTask('fuel')">Refilled</button>
             </div>
             <div class="card">
                 <i class="fas fa-oil-can"></i>
-                <div style="font-size:12px;">Engine Oil</div>
-                <div class="val" id="oilVal" style="font-weight:bold; margin:5px 0;">0 KM</div>
+                <div style="font-size:12px; color:var(--text-dim)">Engine Oil</div>
+                <div class="val" id="oilVal" style="font-weight:bold; margin:5px 0; font-size:18px;">0 KM</div>
                 <div class="bar-bg"><div id="oilBar" class="bar"></div></div>
-                <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('oil')">Changed</button>
+                <button class="btn-outline" style="border:none; text-decoration:underline; cursor:pointer;" onclick="resetTask('oil')">Changed</button>
             </div>
         </div>
     </section>
@@ -105,11 +113,11 @@
     <div id="setupModal" class="modal">
         <div class="modal-content">
             <h3 style="color:var(--primary); margin-top:0;">Bike Configuration</h3>
-            <input type="text" id="inBikeName" placeholder="Bike Name (e.g. Yamaha R15)">
-            <input type="text" id="inBikePlate" placeholder="Bike Number Plate">
+            <input type="text" id="inBikeName" placeholder="Bike Name (e.g. Honda Wave)">
+            <input type="text" id="inBikePlate" placeholder="Plate Number (e.g. MDT9144)">
             <input type="number" id="inFuelLimit" placeholder="Fuel Limit (KM)">
             <input type="number" id="inOilLimit" placeholder="Oil Limit (KM)">
-            <button class="btn btn-primary" onclick="saveBikeSetup()">Save to Cloud</button>
+            <button class="btn btn-primary" id="saveBtn" onclick="saveBikeSetup()">Save to Cloud</button>
             <button class="btn btn-outline" onclick="toggleModal('setupModal')">Cancel</button>
         </div>
     </div>
@@ -133,6 +141,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // International Phone Input Initializer
         const phoneInput = document.querySelector("#userPhone");
         const iti = window.intlTelInput(phoneInput, {
             initialCountry: "auto",
@@ -149,12 +158,13 @@
             document.getElementById('authTitle').innerText = isLoginMode ? "Sign In" : "Registration";
             document.getElementById('regFields').style.display = isLoginMode ? "none" : "block";
             document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Sign Up";
+            document.getElementById('toggleAuth').innerText = isLoginMode ? "Create New Account" : "Back to Login";
         };
 
         window.handleAuth = async () => {
             const email = document.getElementById('userEmail').value;
             const pass = document.getElementById('userPass').value;
-            if(!email || !pass) return alert("Enter credentials");
+            if(!email || !pass) return alert("Please enter email and password");
 
             try {
                 if (isLoginMode) {
@@ -162,10 +172,11 @@
                 } else {
                     const name = document.getElementById('userName').value;
                     const phone = iti.getNumber();
+                    if(!iti.isValidNumber()) return alert("Invalid phone number");
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
                     await setDoc(doc(db, "users", res.user.uid), { name, phone, email, bikeData });
                 }
-            } catch (err) { alert(err.message); }
+            } catch (err) { alert("Auth Error: " + err.message); }
         };
 
         onAuthStateChanged(auth, async user => {
@@ -184,9 +195,9 @@
             const d = await getDoc(doc(db, "users", currentUser.uid));
             if (d.exists()) {
                 const data = d.data();
-                const firstName = data.name.split(' ')[0];
+                const firstName = data.name ? data.name.split(' ')[0] : "User";
                 document.getElementById('dispUserName').innerText = "Hi, " + firstName;
-                bikeData = data.bikeData || bikeData;
+                if(data.bikeData) bikeData = data.bikeData;
                 updateUI();
             }
         }
@@ -205,42 +216,32 @@
         }
 
         window.saveBikeSetup = async () => {
-    // লোডিং ইফেক্ট বাটন টেক্সট পরিবর্তন
-    const saveBtn = document.querySelector('button[onclick="saveBikeSetup()"]');
-    const originalText = saveBtn.innerText;
-    saveBtn.innerText = "Saving...";
-    saveBtn.disabled = true;
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerText = "Saving...";
+            saveBtn.disabled = true;
 
-    // ইনপুট থেকে ডাটা নেওয়া
-    bikeData.bikeName = document.getElementById('inBikeName').value || bikeData.bikeName;
-    bikeData.bikePlate = document.getElementById('inBikePlate').value || bikeData.bikePlate;
-    bikeData.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || bikeData.fuelLimit;
-    bikeData.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || bikeData.oilLimit;
-    
-    try {
-        console.log("Attempting to save data for UID:", currentUser.uid);
-        
-        // Firestore-এ সরাসরি setDoc ব্যবহার করা হচ্ছে (যাতে ফাইল না থাকলেও তৈরি হয়)
-        const userRef = doc(db, "users", currentUser.uid);
-        await setDoc(userRef, { bikeData: bikeData }, { merge: true });
-        
-        console.log("Data saved successfully!");
-        alert("Configuration Saved Successfully!");
-        
-        toggleModal('setupModal');
-        updateUI();
-    } catch (error) {
-        console.error("Save Error:", error);
-        alert("Save Failed: " + error.message);
-    } finally {
-        // বাটন আগের অবস্থায় ফিরিয়ে আনা
-        saveBtn.innerText = originalText;
-        saveBtn.disabled = false;
-    }
-};
+            bikeData.bikeName = document.getElementById('inBikeName').value || bikeData.bikeName;
+            bikeData.bikePlate = document.getElementById('inBikePlate').value || bikeData.bikePlate;
+            bikeData.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || bikeData.fuelLimit;
+            bikeData.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || bikeData.oilLimit;
+            
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                await setDoc(userRef, { bikeData: bikeData }, { merge: true });
+                alert("Settings Saved Successfully!");
+                toggleModal('setupModal');
+                updateUI();
+            } catch (e) {
+                alert("Error: " + e.message + "\nCheck Firestore Rules!");
+            } finally {
+                saveBtn.innerText = "Save to Cloud";
+                saveBtn.disabled = false;
+            }
+        };
+
         window.editOdo = async () => {
-            let n = prompt("Set Odometer (KM):", bikeData.totalOdo);
-            if(n) { 
+            let n = prompt("Enter Current Odometer Reading (KM):", bikeData.totalOdo);
+            if(n !== null) { 
                 bikeData.totalOdo = parseFloat(n); 
                 await updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData }); 
                 updateUI(); 
@@ -248,7 +249,7 @@
         };
 
         window.resetTask = async (type) => {
-            if(confirm("Confirm reset?")) {
+            if(confirm(`Confirm Reset ${type === 'fuel' ? 'Fuel' : 'Oil'} tracker?`)) {
                 if(type==='fuel') bikeData.lastFuelOdo = bikeData.totalOdo;
                 else bikeData.lastOilOdo = bikeData.totalOdo;
                 await updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData });
@@ -256,23 +257,34 @@
             }
         };
 
+        // GPS Tracker Logic
         let watchId = null;
+        let lastPos = null;
         window.toggleTracking = () => {
             const btn = document.getElementById('trackBtn');
             if(!watchId) {
                 btn.innerHTML = '<i class="fas fa-stop"></i> Stop Ride';
-                btn.style.background = 'var(--accent-red)';
-                btn.style.color = 'white';
+                btn.classList.add('btn-stop');
                 watchId = navigator.geolocation.watchPosition(pos => {
-                    bikeData.totalOdo += 0.01; // জিপিএস ট্র্যাকিং লজিক
-                    updateUI();
-                }, null, { enableHighAccuracy: true });
+                    if(lastPos) {
+                        const R = 6371; // Earth Radius KM
+                        const dLat = (pos.coords.latitude - lastPos.latitude) * Math.PI / 180;
+                        const dLon = (pos.coords.longitude - lastPos.longitude) * Math.PI / 180;
+                        const a = Math.sin(dLat/2)**2 + Math.cos(lastPos.latitude*Math.PI/180)*Math.cos(pos.coords.latitude*Math.PI/180)*Math.sin(dLon/2)**2;
+                        const d = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                        if(d > 0.005) { // Update if moved > 5 meters
+                            bikeData.totalOdo += d;
+                            updateUI();
+                        }
+                    }
+                    lastPos = pos.coords;
+                }, err => alert("GPS Error: " + err.message), { enableHighAccuracy: true });
             } else {
                 btn.innerHTML = '<i class="fas fa-play"></i> Start Ride';
-                btn.style.background = 'linear-gradient(90deg, #00ffa3, #00d1ff)';
-                btn.style.color = '#000';
+                btn.classList.remove('btn-stop');
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
+                lastPos = null;
                 updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData });
             }
         };
