@@ -205,23 +205,39 @@
         }
 
         window.saveBikeSetup = async () => {
-            bikeData.bikeName = document.getElementById('inBikeName').value || bikeData.bikeName;
-            bikeData.bikePlate = document.getElementById('inBikePlate').value || bikeData.bikePlate;
-            bikeData.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || bikeData.fuelLimit;
-            bikeData.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || bikeData.oilLimit;
-            
-            try {
-                await updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData });
-                toggleModal('setupModal');
-                updateUI();
-            } catch (e) {
-                // If updateDoc fails (e.g. doc doesn't exist perfectly), try setDoc
-                await setDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData }, { merge: true });
-                toggleModal('setupModal');
-                updateUI();
-            }
-        };
+    // লোডিং ইফেক্ট বাটন টেক্সট পরিবর্তন
+    const saveBtn = document.querySelector('button[onclick="saveBikeSetup()"]');
+    const originalText = saveBtn.innerText;
+    saveBtn.innerText = "Saving...";
+    saveBtn.disabled = true;
 
+    // ইনপুট থেকে ডাটা নেওয়া
+    bikeData.bikeName = document.getElementById('inBikeName').value || bikeData.bikeName;
+    bikeData.bikePlate = document.getElementById('inBikePlate').value || bikeData.bikePlate;
+    bikeData.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || bikeData.fuelLimit;
+    bikeData.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || bikeData.oilLimit;
+    
+    try {
+        console.log("Attempting to save data for UID:", currentUser.uid);
+        
+        // Firestore-এ সরাসরি setDoc ব্যবহার করা হচ্ছে (যাতে ফাইল না থাকলেও তৈরি হয়)
+        const userRef = doc(db, "users", currentUser.uid);
+        await setDoc(userRef, { bikeData: bikeData }, { merge: true });
+        
+        console.log("Data saved successfully!");
+        alert("Configuration Saved Successfully!");
+        
+        toggleModal('setupModal');
+        updateUI();
+    } catch (error) {
+        console.error("Save Error:", error);
+        alert("Save Failed: " + error.message);
+    } finally {
+        // বাটন আগের অবস্থায় ফিরিয়ে আনা
+        saveBtn.innerText = originalText;
+        saveBtn.disabled = false;
+    }
+};
         window.editOdo = async () => {
             let n = prompt("Set Odometer (KM):", bikeData.totalOdo);
             if(n) { 
