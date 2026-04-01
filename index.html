@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Moto-Care Pro | Global Edition</title>
+    <title>Moto-Care Pro | PWA Edition</title>
     
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -14,54 +15,49 @@
             --accent-red: #ff3d71; --text-main: #ffffff; --text-dim: #9da5b1; 
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', sans-serif; margin: 0; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
         
-        /* AUTH SCREEN DESIGNS */
+        /* Auth Screen */
         #authScreen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .auth-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 1px solid #2d363f; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 1px solid #2d363f; text-align: center; }
         input, .iti { width: 100% !important; margin: 8px 0; }
         input { padding: 14px; background: #2d363f; border: 1px solid #3d4752; border-radius: 12px; color: white; font-size: 15px; }
 
-        /* DASHBOARD DESIGNS */
+        /* Dashboard */
         #mainApp { display: none; padding: 15px; max-width: 450px; margin: auto; min-height: 100vh; }
         .header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #2d363f; }
         .header h2 { margin: 0; font-size: 18px; color: var(--primary); }
-        .header p { margin: 4px 0 0; font-size: 11px; color: var(--text-dim); }
-
+        
         .settings-btn { background: #2d363f; border: none; color: white; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        .odo-section { background: linear-gradient(145deg, #1c2227, #13181c); padding: 25px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .odo-display { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-        .odo-display h1 { font-size: 44px; margin: 0; font-family: 'Courier New', monospace; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(0, 255, 163, 0.3); }
+        .odo-section { background: linear-gradient(145deg, #1c2227, #13181c); padding: 25px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; }
+        .odo-display h1 { font-size: 44px; margin: 0; font-family: 'Courier New', monospace; font-weight: bold; }
 
-        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-primary { background: linear-gradient(90deg, #00ffa3, #00d1ff); color: #000; box-shadow: 0 8px 20px rgba(0, 255, 163, 0.2); }
-        .btn-outline { background: none; border: 1px solid var(--primary); color: var(--primary); font-size: 13px; }
+        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+        .btn-primary { background: linear-gradient(90deg, #00ffa3, #00d1ff); color: #000; }
         .btn-stop { background: var(--accent-red) !important; color: white !important; }
+        .btn-outline { background: none; border: 1px solid var(--primary); color: var(--primary); font-size: 13px; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .card { background: var(--card-bg); padding: 18px 12px; border-radius: 20px; text-align: center; border: 1px solid #2d363f; }
-        .card i { font-size: 22px; color: var(--primary); margin-bottom: 8px; }
-
-        /* BATTERY & FUEL ANIMATION STYLES (Point 3) */
-        .bar-bg { background: #2d363f; height: 6px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-        .bar { height: 100%; transition: width 0.3s ease-in-out, background-color 0.5s; width: 0%; }
+        .card { background: var(--card-bg); padding: 18px 12px; border-radius: 20px; text-align: center; border: 1px solid #2d363f; position: relative; overflow: hidden; }
         
-        /* Dynamic Colors for Battery Style Progress (High, Mid, Low) */
-        .bar-high { background-color: var(--primary) !important; } /* High > 50% */
-        .bar-mid { background-color: #ffb800 !important; } /* Mid < 50% */
-        .bar-low { background-color: var(--accent-red) !important; } /* Low < 20% */
+        /* Battery Bars */
+        .bar-bg { background: #2d363f; height: 8px; border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #111; }
+        .bar { height: 100%; transition: width 0.5s ease-in-out, background-color 0.5s; width: 0%; }
+        .bar-high { background: #00ffa3; box-shadow: 0 0 10px #00ffa3; }
+        .bar-mid { background: #ffb800; box-shadow: 0 0 10px #ffb800; }
+        .bar-low { background: #ff3d71; box-shadow: 0 0 10px #ff3d71; }
 
-        /* CSS Refill Animation */
-        @keyframes fuelRefill { 
-            0% { width: 0%; } 
-            100% { width: 100%; } 
+        /* Animation for Refill */
+        @keyframes refillPulse { 
+            0% { transform: scaleX(0); } 
+            100% { transform: scaleX(1); } 
         }
-        .animate-refill { animation: fuelRefill 1s ease-out forwards !important; }
+        .animate-refill { animation: refillPulse 1s ease-out; transform-origin: left; }
 
-        /* MODAL STYLES */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 25px; width: 100%; max-width: 380px; border: 1px solid #2d363f; }
+        /* Modals */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 25px; width: 100%; max-width: 380px; }
     </style>
 </head>
 <body>
@@ -71,11 +67,11 @@
             <i class="fas fa-motorcycle" style="font-size: 45px; color: var(--primary); margin-bottom: 15px;"></i>
             <h2 id="authTitle" style="color:var(--primary)">Sign In</h2>
             <div id="regFields" style="display: none;">
-                <input type="text" id="userName" placeholder="Full Name (e.g. Raihan Sharker)">
+                <input type="text" id="userName" placeholder="Full Name">
                 <input type="tel" id="userPhone">
             </div>
             <input type="email" id="userEmail" placeholder="Email Address">
-            <input type="password" id="userPass" placeholder="Password (min 6 chars)">
+            <input type="password" id="userPass" placeholder="Password">
             <button class="btn btn-primary" id="authBtn" onclick="handleAuth()">Login</button>
             <button class="btn btn-outline" id="toggleAuth" onclick="toggleAuthMode()">Create New Account</button>
         </div>
@@ -84,20 +80,20 @@
     <section id="mainApp">
         <header class="header">
             <div>
-                <h2 id="dispUserName">Hello</h2>
-                <p id="dispBike">Bike Info Loading...</p>
+                <h2 id="dispUserName">Hi, Rider</h2>
+                <p id="dispBike">Honda Wave | MDT9144</p>
             </div>
             <div style="display:flex; gap:10px;">
                 <button class="settings-btn" onclick="toggleModal('setupModal')"><i class="fas fa-motorcycle"></i></button>
-                <button class="settings-btn" style="background:var(--accent-red)" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+                <button class="settings-btn" style="background:var(--accent-red)" onclick="logout()"><i class="fas fa-power-off"></i></button>
             </div>
         </header>
 
         <section class="odo-section">
-            <div style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Total Odometer</div>
+            <div style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Odometer</div>
             <div class="odo-display">
                 <h1 id="mainOdo">0.0</h1>
-                <button class="settings-btn" style="width:30px; height:30px; font-size:12px;" onclick="editOdo()"><i class="fas fa-edit"></i></button>
+                <button class="settings-btn" style="width:30px; height:30px; font-size:12px; margin-top:5px;" onclick="editOdo()"><i class="fas fa-pen"></i></button>
             </div>
         </section>
 
@@ -108,29 +104,29 @@
         <div class="grid">
             <div class="card">
                 <i class="fas fa-gas-pump"></i>
-                <div style="font-size:12px; color:var(--text-dim);">Fuel Range</div>
-                <div class="val" id="fuelVal" style="font-weight:bold; margin:5px 0;">0 KM</div>
+                <div style="font-size:11px; color:var(--text-dim)">Fuel Range</div>
+                <div id="fuelVal" style="font-weight:bold; font-size:18px; margin:5px 0;">0 KM</div>
                 <div class="bar-bg"><div id="fuelBar" class="bar"></div></div>
-                <button class="btn-outline" style="border:none; text-decoration:underline; cursor:pointer;" onclick="resetTask('fuel')">Refilled</button>
+                <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('fuel')">Refill</button>
             </div>
             <div class="card">
                 <i class="fas fa-oil-can"></i>
-                <div style="font-size:12px; color:var(--text-dim);">Engine Oil</div>
-                <div class="val" id="oilVal" style="font-weight:bold; margin:5px 0;">0 KM</div>
+                <div style="font-size:11px; color:var(--text-dim)">Engine Oil</div>
+                <div id="oilVal" style="font-weight:bold; font-size:18px; margin:5px 0;">0 KM</div>
                 <div class="bar-bg"><div id="oilBar" class="bar"></div></div>
-                <button class="btn-outline" style="border:none; text-decoration:underline; cursor:pointer;" onclick="resetTask('oil')">Changed</button>
+                <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('oil')">Change</button>
             </div>
         </div>
     </section>
 
     <div id="setupModal" class="modal">
         <div class="modal-content">
-            <h3 style="color:var(--primary); margin-top:0;">Bike Configuration</h3>
-            <input type="text" id="inBikeName" placeholder="Bike Name (e.g. Honda Wave)">
-            <input type="text" id="inBikePlate" placeholder="Plate Number (e.g. MDT9144)">
-            <input type="number" id="inFuelLimit" placeholder="Fuel Limit (e.g. 150 KM)">
-            <input type="number" id="inOilLimit" placeholder="Oil Limit (e.g. 2000 KM)">
-            <button class="btn btn-primary" onclick="saveBikeSetup()">Save to Cloud</button>
+            <h3 style="color:var(--primary); margin-top:0;">Configuration</h3>
+            <input type="text" id="inBikeName" placeholder="Bike Name">
+            <input type="text" id="inBikePlate" placeholder="Plate Number">
+            <input type="number" id="inFuelLimit" placeholder="Fuel Limit (KM)">
+            <input type="number" id="inOilLimit" placeholder="Oil Limit (KM)">
+            <button class="btn btn-primary" onclick="saveBikeSetup()">Save Configuration</button>
             <button class="btn btn-outline" onclick="toggleModal('setupModal')">Cancel</button>
         </div>
     </div>
@@ -141,7 +137,6 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Configuration (Same as your initial input)
         const firebaseConfig = {
             apiKey: "AIzaSyBYP2X8KQaF-1S7IpMqSdQ6DKAbGZMoags",
             authDomain: "moto-care-pro.firebaseapp.com",
@@ -155,7 +150,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Int Telephone Input (Country Detection)
+        // Int Tel Input
         const phoneInput = document.querySelector("#userPhone");
         const iti = window.intlTelInput(phoneInput, {
             initialCountry: "auto",
@@ -165,12 +160,13 @@
 
         let isLoginMode = true;
         let currentUser = null;
+        let wakeLock = null;
         let bikeData = { totalOdo: 0.0, fuelLimit: 150, oilLimit: 2000, lastFuelOdo: 0, lastOilOdo: 0, bikeName: "My Bike", bikePlate: "" };
 
-        // Authentication Handlers
+        // AUTH LOGIC
         window.toggleAuthMode = () => {
             isLoginMode = !isLoginMode;
-            document.getElementById('authTitle').innerText = isLoginMode ? "Sign In" : "Registration";
+            document.getElementById('authTitle').innerText = isLoginMode ? "Sign In" : "Register";
             document.getElementById('regFields').style.display = isLoginMode ? "none" : "block";
             document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Sign Up";
         };
@@ -178,7 +174,7 @@
         window.handleAuth = async () => {
             const email = document.getElementById('userEmail').value;
             const pass = document.getElementById('userPass').value;
-            if(!email || !pass) return alert("Enter credentials");
+            if(!email || !pass) return alert("Missing info");
 
             try {
                 if (isLoginMode) {
@@ -187,18 +183,8 @@
                     const name = document.getElementById('userName').value;
                     const phone = iti.getNumber();
                     const country = iti.getSelectedCountryData().name;
-                    if(!name) return alert("Please enter your name");
-                    if(!iti.isValidNumber()) return alert("Invalid phone number");
-                    
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    // Point 2: Saving user full info on Cloud
-                    await setDoc(doc(db, "users", res.user.uid), { 
-                        name, 
-                        phone, 
-                        email, 
-                        country,
-                        bikeData 
-                    });
+                    await setDoc(doc(db, "users", res.user.uid), { name, phone, email, country, bikeData });
                 }
             } catch (err) { alert(err.message); }
         };
@@ -219,111 +205,112 @@
             const d = await getDoc(doc(db, "users", currentUser.uid));
             if (d.exists()) {
                 const data = d.data();
-                // Point 1: Displaying First Name (Hi, Raihan)
-                const fullName = data.name || "User";
-                const firstName = fullName.split(' ')[0];
+                const firstName = (data.name || "User").split(' ')[0];
                 document.getElementById('dispUserName').innerText = "Hi, " + firstName;
-                
                 bikeData = data.bikeData || bikeData;
                 updateUI();
             }
         }
 
-        // Updating UI with GPS kilometer decrease logic (Battery Style)
+        // UI & PROGRESS BARS
         function updateUI() {
             document.getElementById('mainOdo').innerText = bikeData.totalOdo.toFixed(1);
-            document.getElementById('dispBike').innerText = `${bikeData.bikeName} | ${bikeData.bikePlate || 'No Plate'}`;
+            document.getElementById('dispBike').innerText = `${bikeData.bikeName} | ${bikeData.bikePlate || '---'}`;
             
-            // Fuel Logic
-            const fuelUsed = bikeData.totalOdo - bikeData.lastFuelOdo;
-            let fLeft = Math.max(0, bikeData.fuelLimit - fuelUsed);
-            document.getElementById('fuelVal').innerText = fLeft.toFixed(1) + " KM";
-            updateProgressBar("fuelBar", fLeft / bikeData.fuelLimit);
-
-            // Oil Logic
-            const oilUsed = bikeData.totalOdo - bikeData.lastOilOdo;
-            let oLeft = Math.max(0, bikeData.oilLimit - oilUsed);
-            document.getElementById('oilVal').innerText = oLeft.toFixed(1) + " KM";
-            updateProgressBar("oilBar", oLeft / bikeData.oilLimit);
+            updateComponent('fuel', bikeData.fuelLimit, bikeData.lastFuelOdo);
+            updateComponent('oil', bikeData.oilLimit, bikeData.lastOilOdo);
         }
 
-        // Battery style progress bar coloring (Point 3)
-        function updateProgressBar(barId, percentage) {
-            const bar = document.getElementById(barId);
-            bar.style.width = (percentage * 100) + "%";
-            bar.className = "bar"; // Reset classes
-
-            if (percentage > 0.5) { bar.classList.add("bar-high"); }
-            else if (percentage > 0.2) { bar.classList.add("bar-mid"); }
-            else { bar.classList.add("bar-low"); }
+        function updateComponent(type, limit, last) {
+            const left = Math.max(0, limit - (bikeData.totalOdo - last));
+            const pct = left / limit;
+            document.getElementById(`${type}Val`).innerText = left.toFixed(1) + " KM";
+            const bar = document.getElementById(`${type}Bar`);
+            bar.style.width = (pct * 100) + "%";
+            bar.className = "bar " + (pct > 0.5 ? "bar-high" : (pct > 0.2 ? "bar-mid" : "bar-low"));
         }
 
-        // Action Buttons Handlers
-        window.saveBikeSetup = async () => {
-            bikeData.bikeName = document.getElementById('inBikeName').value || bikeData.bikeName;
-            bikeData.bikePlate = document.getElementById('inBikePlate').value || bikeData.bikePlate;
-            bikeData.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || bikeData.fuelLimit;
-            bikeData.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || bikeData.oilLimit;
-            
-            await setDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData }, { merge: true });
-            toggleModal('setupModal');
-            updateUI();
-        };
-
-        window.editOdo = async () => {
-            let n = prompt("Set Odometer (KM):", bikeData.totalOdo);
-            if(n) { 
-                bikeData.totalOdo = parseFloat(n); 
-                await updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData }); 
-                updateUI(); 
-            }
-        };
-
-        // CSS Refill Animation Logic (Point 3)
-        window.resetTask = async (type) => {
-            if(confirm("Confirm reset?")) {
-                const barId = type === 'fuel' ? 'fuelBar' : 'oilBar';
-                const bar = document.getElementById(barId);
-                bar.classList.add("animate-refill"); // Add animation class
-                
-                if(type==='fuel') bikeData.lastFuelOdo = bikeData.totalOdo;
-                else bikeData.lastOilOdo = bikeData.totalOdo;
-                
-                await updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData });
-                
-                setTimeout(() => {
-                    bar.classList.remove("animate-refill"); // Remove after 1s
-                    updateUI();
-                }, 1000);
-            }
-        };
-
-        // GPS Tracker with simulated odometer increase
+        // BACKGROUND GPS TRACKING (CRITICAL FIX)
         let watchId = null;
-        window.toggleTracking = () => {
+        let lastPos = null;
+
+        window.toggleTracking = async () => {
             const btn = document.getElementById('trackBtn');
             if(!watchId) {
+                // Request Wake Lock to keep GPS alive even when locked
+                if ('wakeLock' in navigator) {
+                    try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+                }
+
                 btn.innerHTML = '<i class="fas fa-stop"></i> Stop Ride';
                 btn.classList.add("btn-stop");
+
                 watchId = navigator.geolocation.watchPosition(pos => {
-                    bikeData.totalOdo += 0.01; // Simulating movement by increasing Odo
-                    updateUI();
-                }, null, { enableHighAccuracy: true });
+                    if(lastPos) {
+                        const d = calcDist(lastPos.coords.latitude, lastPos.coords.longitude, pos.coords.latitude, pos.coords.longitude);
+                        if(d > 0.005) { // 5 meters move
+                            bikeData.totalOdo += d;
+                            updateUI();
+                        }
+                    }
+                    lastPos = pos;
+                }, null, { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
+
             } else {
                 btn.innerHTML = '<i class="fas fa-play"></i> Start Ride';
                 btn.classList.remove("btn-stop");
                 navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-                updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData });
+                if(wakeLock) wakeLock.release();
+                watchId = null; lastPos = null;
+                await updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData });
             }
         };
 
-        // UI Helpers
+        function calcDist(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2-lat1)*Math.PI/180;
+            const dLon = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        // ACTIONS
+        window.resetTask = async (type) => {
+            if(confirm("Confirm Reset?")) {
+                const bar = document.getElementById(type + 'Bar');
+                bar.classList.add('animate-refill');
+                if(type==='fuel') bikeData.lastFuelOdo = bikeData.totalOdo;
+                else bikeData.lastOilOdo = bikeData.totalOdo;
+                await updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData });
+                setTimeout(() => { bar.classList.remove('animate-refill'); updateUI(); }, 1000);
+            }
+        };
+
+        window.saveBikeSetup = async () => {
+            bikeData.bikeName = document.getElementById('inBikeName').value || bikeData.bikeName;
+            bikeData.bikePlate = document.getElementById('inBikePlate').value || bikeData.bikePlate;
+            bikeData.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || 150;
+            bikeData.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || 2000;
+            await setDoc(doc(db, "users", currentUser.uid), { bikeData }, { merge: true });
+            toggleModal('setupModal'); updateUI();
+        };
+
+        window.editOdo = async () => {
+            let n = prompt("Current Odometer:", bikeData.totalOdo);
+            if(n) { bikeData.totalOdo = parseFloat(n); updateUI(); }
+        };
+
         window.toggleModal = id => {
             const m = document.getElementById(id);
             m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         };
+
         window.logout = () => signOut(auth);
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => console.log("PWA Active"));
+        }
     </script>
 </body>
 </html>
