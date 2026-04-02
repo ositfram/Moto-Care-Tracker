@@ -1,18 +1,23 @@
 {
   "name": "Moto-Care Pro",
   "short_name": "MotoCare",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#0f1215",
   "theme_color": "#00ffa3",
-  "description": "Bike Maintenance Tracker",
   "orientation": "portrait",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3198/3198336.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3198/3198336.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }
