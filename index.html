@@ -3,61 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Moto-Care Pro | PWA Edition</title>
+    <meta name="theme-color" content="#00ffa3">
+    <title>Moto-Care Pro | PWA</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        :root { 
-            --bg-color: #0f1215; --card-bg: #1c2227; --primary: #00ffa3; 
-            --accent-red: #ff3d71; --text-main: #ffffff; --text-dim: #9da5b1; 
-        }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        :root { --bg: #0f1215; --card: #1c2227; --primary: #00ffa3; --red: #ff3d71; --dim: #9da5b1; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
         
-        /* Auth Screen */
         #authScreen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .auth-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 1px solid #2d363f; text-align: center; }
+        .auth-card { background: var(--card); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 1px solid #2d363f; text-align: center; }
         input, .iti { width: 100% !important; margin: 8px 0; }
-        input { padding: 14px; background: #2d363f; border: 1px solid #3d4752; border-radius: 12px; color: white; font-size: 15px; }
+        input { padding: 14px; background: #2d363f; border: 1px solid #3d4752; border-radius: 12px; color: white; }
 
-        /* Dashboard */
-        #mainApp { display: none; padding: 15px; max-width: 450px; margin: auto; min-height: 100vh; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #2d363f; }
-        .header h2 { margin: 0; font-size: 18px; color: var(--primary); }
-        
-        .settings-btn { background: #2d363f; border: none; color: white; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
+        #mainApp { display: none; padding: 15px; max-width: 450px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 15px 20px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #2d363f; }
         .odo-section { background: linear-gradient(145deg, #1c2227, #13181c); padding: 25px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; }
-        .odo-display h1 { font-size: 44px; margin: 0; font-family: 'Courier New', monospace; font-weight: bold; }
-
-        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+        
+        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
         .btn-primary { background: linear-gradient(90deg, #00ffa3, #00d1ff); color: #000; }
-        .btn-stop { background: var(--accent-red) !important; color: white !important; }
+        .btn-stop { background: var(--red) !important; color: white !important; }
         .btn-outline { background: none; border: 1px solid var(--primary); color: var(--primary); font-size: 13px; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .card { background: var(--card-bg); padding: 18px 12px; border-radius: 20px; text-align: center; border: 1px solid #2d363f; position: relative; overflow: hidden; }
+        .card { background: var(--card); padding: 18px 12px; border-radius: 20px; text-align: center; border: 1px solid #2d363f; }
         
-        /* Battery Bars */
-        .bar-bg { background: #2d363f; height: 8px; border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #111; }
-        .bar { height: 100%; transition: width 0.5s ease-in-out, background-color 0.5s; width: 0%; }
-        .bar-high { background: #00ffa3; box-shadow: 0 0 10px #00ffa3; }
-        .bar-mid { background: #ffb800; box-shadow: 0 0 10px #ffb800; }
-        .bar-low { background: #ff3d71; box-shadow: 0 0 10px #ff3d71; }
+        .bar-bg { background: #2d363f; height: 8px; border-radius: 10px; overflow: hidden; margin: 12px 0; }
+        .bar { height: 100%; transition: width 0.5s, background 0.5s; width: 0%; }
+        .bar-high { background: #00ffa3; }
+        .bar-mid { background: #ffb800; }
+        .bar-low { background: #ff3d71; }
+        @keyframes refill { 0% { width: 0%; } 100% { width: 100%; } }
+        .animate-refill { animation: refill 1s ease-out forwards; }
 
-        /* Animation for Refill */
-        @keyframes refillPulse { 
-            0% { transform: scaleX(0); } 
-            100% { transform: scaleX(1); } 
-        }
-        .animate-refill { animation: refillPulse 1s ease-out; transform-origin: left; }
-
-        /* Modals */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 25px; width: 100%; max-width: 380px; }
+        .modal-content { background: var(--card); padding: 25px; border-radius: 25px; width: 100%; max-width: 380px; }
     </style>
 </head>
 <body>
@@ -79,40 +63,31 @@
 
     <section id="mainApp">
         <header class="header">
-            <div>
-                <h2 id="dispUserName">Hi, Rider</h2>
-                <p id="dispBike">Honda Wave | MDT9144</p>
-            </div>
+            <div><h2 id="dispUserName">Hi, Rider</h2><p id="dispBike" style="margin:0; font-size:12px; color:var(--dim)">Loading...</p></div>
             <div style="display:flex; gap:10px;">
-                <button class="settings-btn" onclick="toggleModal('setupModal')"><i class="fas fa-motorcycle"></i></button>
-                <button class="settings-btn" style="background:var(--accent-red)" onclick="logout()"><i class="fas fa-power-off"></i></button>
+                <button style="background:#2d363f; color:#fff; border:none; width:40px; height:40px; border-radius:12px;" onclick="toggleModal('setupModal')"><i class="fas fa-cog"></i></button>
+                <button style="background:var(--red); color:#fff; border:none; width:40px; height:40px; border-radius:12px;" onclick="logout()"><i class="fas fa-power-off"></i></button>
             </div>
         </header>
 
-        <section class="odo-section">
-            <div style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Odometer</div>
-            <div class="odo-display">
-                <h1 id="mainOdo">0.0</h1>
-                <button class="settings-btn" style="width:30px; height:30px; font-size:12px; margin-top:5px;" onclick="editOdo()"><i class="fas fa-pen"></i></button>
-            </div>
-        </section>
+        <div class="odo-section">
+            <div style="font-size: 10px; color: var(--dim);">TOTAL ODOMETER</div>
+            <h1 id="mainOdo" style="font-size:48px; margin:10px 0;">0.0</h1>
+            <button class="btn-outline" style="margin:auto; padding:5px 15px; border-radius:8px;" onclick="editOdo()">Edit Odo</button>
+        </div>
 
-        <button id="trackBtn" class="btn btn-primary" onclick="toggleTracking()">
-            <i class="fas fa-play"></i> Start Ride
-        </button>
+        <button id="trackBtn" class="btn btn-primary" onclick="toggleTracking()"><i class="fas fa-play"></i> Start Ride</button>
 
         <div class="grid">
             <div class="card">
-                <i class="fas fa-gas-pump"></i>
-                <div style="font-size:11px; color:var(--text-dim)">Fuel Range</div>
-                <div id="fuelVal" style="font-weight:bold; font-size:18px; margin:5px 0;">0 KM</div>
+                <i class="fas fa-gas-pump"></i><div style="font-size:11px; margin-top:5px;">Fuel Range</div>
+                <div id="fuelVal" style="font-weight:bold; font-size:18px;">0 KM</div>
                 <div class="bar-bg"><div id="fuelBar" class="bar"></div></div>
                 <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('fuel')">Refill</button>
             </div>
             <div class="card">
-                <i class="fas fa-oil-can"></i>
-                <div style="font-size:11px; color:var(--text-dim)">Engine Oil</div>
-                <div id="oilVal" style="font-weight:bold; font-size:18px; margin:5px 0;">0 KM</div>
+                <i class="fas fa-oil-can"></i><div style="font-size:11px; margin-top:5px;">Engine Oil</div>
+                <div id="oilVal" style="font-weight:bold; font-size:18px;">0 KM</div>
                 <div class="bar-bg"><div id="oilBar" class="bar"></div></div>
                 <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('oil')">Change</button>
             </div>
@@ -121,12 +96,12 @@
 
     <div id="setupModal" class="modal">
         <div class="modal-content">
-            <h3 style="color:var(--primary); margin-top:0;">Configuration</h3>
+            <h3 style="color:var(--primary); margin-top:0;">Bike Setup</h3>
             <input type="text" id="inBikeName" placeholder="Bike Name">
             <input type="text" id="inBikePlate" placeholder="Plate Number">
             <input type="number" id="inFuelLimit" placeholder="Fuel Limit (KM)">
             <input type="number" id="inOilLimit" placeholder="Oil Limit (KM)">
-            <button class="btn btn-primary" onclick="saveBikeSetup()">Save Configuration</button>
+            <button class="btn btn-primary" onclick="saveBikeSetup()">Save</button>
             <button class="btn btn-outline" onclick="toggleModal('setupModal')">Cancel</button>
         </div>
     </div>
@@ -150,11 +125,10 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Int Tel Input
         const phoneInput = document.querySelector("#userPhone");
         const iti = window.intlTelInput(phoneInput, {
             initialCountry: "auto",
-            geoIpLookup: success => fetch("https://ipapi.co/json").then(res => res.json()).then(data => success(data.country_code)).catch(() => success("MY")),
+            geoIpLookup: s => fetch("https://ipapi.co/json").then(r => r.json()).then(d => s(d.country_code)).catch(() => s("MY")),
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
         });
 
@@ -163,7 +137,6 @@
         let wakeLock = null;
         let bikeData = { totalOdo: 0.0, fuelLimit: 150, oilLimit: 2000, lastFuelOdo: 0, lastOilOdo: 0, bikeName: "My Bike", bikePlate: "" };
 
-        // AUTH LOGIC
         window.toggleAuthMode = () => {
             isLoginMode = !isLoginMode;
             document.getElementById('authTitle').innerText = isLoginMode ? "Sign In" : "Register";
@@ -174,17 +147,14 @@
         window.handleAuth = async () => {
             const email = document.getElementById('userEmail').value;
             const pass = document.getElementById('userPass').value;
-            if(!email || !pass) return alert("Missing info");
-
             try {
                 if (isLoginMode) {
                     await signInWithEmailAndPassword(auth, email, pass);
                 } else {
                     const name = document.getElementById('userName').value;
                     const phone = iti.getNumber();
-                    const country = iti.getSelectedCountryData().name;
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    await setDoc(doc(db, "users", res.user.uid), { name, phone, email, country, bikeData });
+                    await setDoc(doc(db, "users", res.user.uid), { name, phone, email, country: iti.getSelectedCountryData().name, bikeData });
                 }
             } catch (err) { alert(err.message); }
         };
@@ -194,34 +164,27 @@
                 currentUser = user;
                 document.getElementById('authScreen').style.display = "none";
                 document.getElementById('mainApp').style.display = "block";
-                loadData();
+                const d = await getDoc(doc(db, "users", user.uid));
+                if(d.exists()){
+                    const data = d.data();
+                    document.getElementById('dispUserName').innerText = "Hi, " + (data.name || "Rider").split(' ')[0];
+                    bikeData = data.bikeData || bikeData;
+                    updateUI();
+                }
             } else {
                 document.getElementById('authScreen').style.display = "flex";
                 document.getElementById('mainApp').style.display = "none";
             }
         });
 
-        async function loadData() {
-            const d = await getDoc(doc(db, "users", currentUser.uid));
-            if (d.exists()) {
-                const data = d.data();
-                const firstName = (data.name || "User").split(' ')[0];
-                document.getElementById('dispUserName').innerText = "Hi, " + firstName;
-                bikeData = data.bikeData || bikeData;
-                updateUI();
-            }
-        }
-
-        // UI & PROGRESS BARS
         function updateUI() {
             document.getElementById('mainOdo').innerText = bikeData.totalOdo.toFixed(1);
-            document.getElementById('dispBike').innerText = `${bikeData.bikeName} | ${bikeData.bikePlate || '---'}`;
-            
-            updateComponent('fuel', bikeData.fuelLimit, bikeData.lastFuelOdo);
-            updateComponent('oil', bikeData.oilLimit, bikeData.lastOilOdo);
+            document.getElementById('dispBike').innerText = `${bikeData.bikeName} | ${bikeData.bikePlate}`;
+            updateProgress('fuel', bikeData.fuelLimit, bikeData.lastFuelOdo);
+            updateProgress('oil', bikeData.oilLimit, bikeData.lastOilOdo);
         }
 
-        function updateComponent(type, limit, last) {
+        function updateProgress(type, limit, last) {
             const left = Math.max(0, limit - (bikeData.totalOdo - last));
             const pct = left / limit;
             document.getElementById(`${type}Val`).innerText = left.toFixed(1) + " KM";
@@ -230,39 +193,28 @@
             bar.className = "bar " + (pct > 0.5 ? "bar-high" : (pct > 0.2 ? "bar-mid" : "bar-low"));
         }
 
-        // BACKGROUND GPS TRACKING (CRITICAL FIX)
         let watchId = null;
         let lastPos = null;
-
         window.toggleTracking = async () => {
             const btn = document.getElementById('trackBtn');
             if(!watchId) {
-                // Request Wake Lock to keep GPS alive even when locked
-                if ('wakeLock' in navigator) {
-                    try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
-                }
-
+                if ('wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){} }
                 btn.innerHTML = '<i class="fas fa-stop"></i> Stop Ride';
                 btn.classList.add("btn-stop");
-
                 watchId = navigator.geolocation.watchPosition(pos => {
                     if(lastPos) {
                         const d = calcDist(lastPos.coords.latitude, lastPos.coords.longitude, pos.coords.latitude, pos.coords.longitude);
-                        if(d > 0.005) { // 5 meters move
-                            bikeData.totalOdo += d;
-                            updateUI();
-                        }
+                        if(d > 0.005) { bikeData.totalOdo += d; updateUI(); }
                     }
                     lastPos = pos;
-                }, null, { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
-
+                }, null, { enableHighAccuracy: true, maximumAge: 0 });
             } else {
                 btn.innerHTML = '<i class="fas fa-play"></i> Start Ride';
                 btn.classList.remove("btn-stop");
                 navigator.geolocation.clearWatch(watchId);
                 if(wakeLock) wakeLock.release();
                 watchId = null; lastPos = null;
-                await updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData });
+                await updateDoc(doc(db, "users", currentUser.uid), { bikeData });
             }
         };
 
@@ -274,15 +226,12 @@
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
-        // ACTIONS
-        window.resetTask = async (type) => {
+        window.resetTask = async (t) => {
             if(confirm("Confirm Reset?")) {
-                const bar = document.getElementById(type + 'Bar');
-                bar.classList.add('animate-refill');
-                if(type==='fuel') bikeData.lastFuelOdo = bikeData.totalOdo;
-                else bikeData.lastOilOdo = bikeData.totalOdo;
-                await updateDoc(doc(db, "users", currentUser.uid), { bikeData: bikeData });
-                setTimeout(() => { bar.classList.remove('animate-refill'); updateUI(); }, 1000);
+                document.getElementById(t+'Bar').classList.add('animate-refill');
+                if(t==='fuel') bikeData.lastFuelOdo = bikeData.totalOdo; else bikeData.lastOilOdo = bikeData.totalOdo;
+                await updateDoc(doc(db, "users", currentUser.uid), { bikeData });
+                setTimeout(() => { document.getElementById(t+'Bar').classList.remove('animate-refill'); updateUI(); }, 1000);
             }
         };
 
@@ -297,20 +246,13 @@
 
         window.editOdo = async () => {
             let n = prompt("Current Odometer:", bikeData.totalOdo);
-            if(n) { bikeData.totalOdo = parseFloat(n); updateUI(); }
+            if(n) { bikeData.totalOdo = parseFloat(n); updateUI(); await updateDoc(doc(db, "users", currentUser.uid), { bikeData });}
         };
 
-        window.toggleModal = id => {
-            const m = document.getElementById(id);
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-        };
-
+        window.toggleModal = i => { const m = document.getElementById(i); m.style.display = (m.style.display==='flex'?'none':'flex'); };
         window.logout = () => signOut(auth);
 
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => console.log("PWA Active"));
-        }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
     </script>
 </body>
 </html>
