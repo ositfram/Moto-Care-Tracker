@@ -1,10 +1,11 @@
 {
-  "name": "Moto-Care Tracker",
+  "name": "Moto-Care Pro",
   "short_name": "MotoCare",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#0f1215",
   "theme_color": "#00ffa3",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3198/3198336.png",
