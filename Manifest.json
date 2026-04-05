@@ -1,14 +1,10 @@
 {
   "name": "Moto-Care Pro",
   "short_name": "MotoCare",
-  "description": "Smart bike maintenance tracker with GPS ride tracking",
   "start_url": "/Moto-Care-Tracker/",
-  "scope": "/Moto-Care-Tracker/",
   "display": "standalone",
   "background_color": "#0f1215",
   "theme_color": "#00ffa3",
-  "orientation": "portrait",
-  "id": "/Moto-Care-Tracker/",
   "icons": [
     {
       "src": "/Moto-Care-Tracker/icons/icon-192.png",
@@ -18,8 +14,7 @@
     {
       "src": "/Moto-Care-Tracker/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "type": "image/png"
     }
   ]
 }
