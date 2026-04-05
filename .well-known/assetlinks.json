@@ -1,1 +1,12 @@
-
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.shetu.motocare.pro",
+      "sha256_cert_fingerprints": [
+        "A9:35:A9:F9:81:76:07:70:29:38:7E:82:D5:4C:90:2B:AE:0D:FB:26:2C:B2:F0:E3:14:63:46:D8:84:E0:DB:6F"
+      ]
+    }
+  }
+]
