@@ -1,20 +1,23 @@
 {
   "name": "Moto-Care Pro",
   "short_name": "MotoCare",
-  "start_url": "index.html",
+  "description": "Smart bike maintenance tracker with GPS ride tracking and fuel monitoring.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0f1215",
   "theme_color": "#00ffa3",
   "orientation": "portrait",
+  "id": "/?source=pwa",
+  "categories": ["productivity", "utilities", "automotive"],
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3198/3198336.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3198/3198336.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
