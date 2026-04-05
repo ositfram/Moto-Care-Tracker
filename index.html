@@ -1,218 +1,168 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#00ffa3">
-<title>Moto-Care Pro</title>
-
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-<style>
-body{background:#0f1215;color:#fff;font-family:sans-serif;margin:0;text-align:center}
-.card{background:#1c2227;margin:10px;padding:20px;border-radius:20px}
-.btn{padding:15px;border:none;border-radius:10px;margin:5px;cursor:pointer}
-.primary{background:#00ffa3;color:#000}
-.stop{background:#ff3d71;color:#fff}
-input{padding:10px;margin:5px;border-radius:8px;border:none;width:80%}
-</style>
-</head>
-
-<body>
-
-<h2>Moto-Care Pro</h2>
-
-<div id="auth">
-<input id="email" placeholder="Email"><br>
-<input id="pass" placeholder="Password" type="password"><br>
-<button class="btn primary" onclick="login()">Login</button>
-<button class="btn" onclick="register()">Register</button>
-</div>
-
-<div id="app" style="display:none">
-
-<div class="card">
-<h1 id="odo">0 KM</h1>
-<button id="trackBtn" class="btn primary">Start Ride</button>
-</div>
-
-<div class="card">
-<p>Trip: <span id="trip">0</span> KM</p>
-<p>Speed: <span id="speed">0</span> km/h</p>
-<p>Time: <span id="time">0:00</span></p>
-</div>
-
-<div class="card">
-<p>Fuel Left: <span id="fuel">0</span> KM</p>
-<button onclick="refill()">Refill</button>
-</div>
-
-</div>
+<!-- ONLY SCRIPT PART REPLACE (UI SAME থাকবে) -->
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// 🔥 YOUR CONFIG
-const app = initializeApp({
-  apiKey: "AIzaSyBYP2X8KQaF-1S7IpMqSdQ6DKAbGZMoags",
-  authDomain: "moto-care-pro.firebaseapp.com",
-  projectId: "moto-care-pro",
-  storageBucket: "moto-care-pro.firebasestorage.app",
-  messagingSenderId: "621207883659",
-  appId: "1:621207883659:web:e1ba58f7aec638c5dca98e"
-});
+// 🔥 ADD THIS (top এর দিকে)
+let saveTimer = null;
 
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// DATA
-let user=null;
-let bikeData={totalOdo:0,fuelLimit:150,lastFuelOdo:0};
-let watchId=null,lastPos=null,trip=0,startTime=0;
-
-// LOGIN
-window.login=async()=>{
-  await signInWithEmailAndPassword(auth,email.value,pass.value);
-};
-
-// REGISTER
-window.register=async()=>{
-  const res=await createUserWithEmailAndPassword(auth,email.value,pass.value);
-  await setDoc(doc(db,"users",res.user.uid),{bikeData});
-};
-
-// AUTH STATE
-onAuthStateChanged(auth,async u=>{
-  if(u){
-    user=u;
-    auth.style.display="none";
-    appDiv.style.display="block";
-
-    const d=await getDoc(doc(db,"users",u.uid));
-    if(d.exists()) bikeData=d.data().bikeData;
-
-    loadLocal();
-    updateUI();
-  }
-});
-
-// LOCAL SAVE
+// 🔥 LOCAL BACKUP
 function saveLocal(){
-  localStorage.setItem("bikeData",JSON.stringify(bikeData));
+  localStorage.setItem("bikeData", JSON.stringify(bikeData));
 }
+
 function loadLocal(){
-  const d=localStorage.getItem("bikeData");
-  if(d) bikeData=JSON.parse(d);
+  const data = localStorage.getItem("bikeData");
+  if(data) bikeData = JSON.parse(data);
 }
 
-// DISTANCE
-function calcDist(a,b,c,d){
-  const R=6371;
-  const dLat=(c-a)*Math.PI/180;
-  const dLon=(d-b)*Math.PI/180;
-  const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+// 🔥 AUTO SAVE
+function startAutoSave(){
+  saveTimer = setInterval(()=>{
+    if(currentUser){
+      updateDoc(doc(db,"users",currentUser.uid),{bikeData});
+      saveLocal();
+    }
+  },10000);
 }
 
-// UI
-function updateUI(speed=0){
-  odo.innerText=bikeData.totalOdo.toFixed(1)+" KM";
-  tripEl.innerText=trip.toFixed(2);
-  speedEl.innerText=speed.toFixed(0);
+function stopAutoSave(){
+  clearInterval(saveTimer);
+}
 
-  if(startTime){
-    const s=Math.floor((Date.now()-startTime)/1000);
-    timeEl.innerText=Math.floor(s/60)+":"+(s%60).toString().padStart(2,'0');
+// 🔥 FIX AUTH (replace your handleAuth)
+window.handleAuth = async () => {
+  const email = document.getElementById('userEmail').value;
+  const pass = document.getElementById('userPass').value;
+
+  if(!email || !pass){
+    alert("Email & Password required!");
+    return;
   }
 
-  const fuelLeft=bikeData.fuelLimit-(bikeData.totalOdo-bikeData.lastFuelOdo);
-  fuel.innerText=fuelLeft.toFixed(0);
+  try{
+    if(isLoginMode){
+      await signInWithEmailAndPassword(auth,email,pass);
+    }else{
+      const name = document.getElementById('userName').value;
+      const phone = iti.getNumber();
 
-  if(fuelLeft<30) notify("Fuel Low!");
-}
+      if(!name || !phone){
+        alert("Fill all fields!");
+        return;
+      }
 
-// NOTIFY
-function notify(msg){
-  if(Notification.permission==="granted"){
-    new Notification(msg);
+      const res = await createUserWithEmailAndPassword(auth,email,pass);
+
+      await setDoc(doc(db,"users",res.user.uid),{
+        name,
+        phone,
+        email,
+        country: iti.getSelectedCountryData().name,
+        bikeData
+      });
+    }
+  }catch(err){
+    alert(err.message);
+    console.error(err);
   }
-}
-Notification.requestPermission();
+};
 
-// TRACK
-trackBtn.onclick=()=>{
+// 🔥 UPDATE AUTH STATE (small fix)
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    currentUser = user;
+
+    loadLocal(); // 🔥 NEW
+
+    document.getElementById('authScreen').style.display = "none";
+    document.getElementById('mainApp').style.display = "block";
+
+    const d = await getDoc(doc(db, "users", user.uid));
+    if(d.exists()){
+      const data = d.data();
+      bikeData = data.bikeData || bikeData;
+      updateUI();
+    }
+  } else {
+    document.getElementById('authScreen').style.display = "flex";
+    document.getElementById('mainApp').style.display = "none";
+  }
+});
+
+// 🔥 GPS OPTIMIZED TRACKING
+window.toggleTracking = async () => {
+  const btn = document.getElementById('trackBtn');
+
   if(!watchId){
-    trip=0;
-    startTime=Date.now();
 
-    trackBtn.innerText="Stop Ride";
-    trackBtn.classList.add("stop");
+    startAutoSave(); // 🔥 NEW
 
-    watchId=navigator.geolocation.watchPosition(pos=>{
-      let speed=0;
+    if ('wakeLock' in navigator) {
+      try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+    }
+
+    btn.innerHTML = '<i class="fas fa-stop"></i> Stop Ride';
+    btn.classList.add("btn-stop");
+
+    watchId = navigator.geolocation.watchPosition(pos => {
 
       if(lastPos){
-        const d=calcDist(
+        const d = calcDist(
           lastPos.coords.latitude,
           lastPos.coords.longitude,
           pos.coords.latitude,
           pos.coords.longitude
         );
 
-        const t=(pos.timestamp-lastPos.timestamp)/1000;
-        speed=(d/t)*3600;
-
-        if(d>0.003){
-          bikeData.totalOdo+=d;
-          trip+=d;
+        if(d > 0.003){ // 🔥 better filter
+          bikeData.totalOdo += d;
+          updateUI();
+          saveLocal(); // 🔥 NEW
         }
       }
 
-      lastPos=pos;
-      updateUI(speed);
-      saveLocal();
+      lastPos = pos;
 
-    },null,{
-      enableHighAccuracy:false,
-      maximumAge:3000
+    }, err => {
+      console.error(err);
+    }, {
+      enableHighAccuracy: false, // 🔥 battery save
+      maximumAge: 3000,
+      timeout: 10000
     });
 
-  }else{
+  } else {
+
+    stopAutoSave(); // 🔥 NEW
+
     navigator.geolocation.clearWatch(watchId);
-    watchId=null;
-    lastPos=null;
+    watchId = null;
+    lastPos = null;
 
-    updateDoc(doc(db,"users",user.uid),{bikeData});
+    if(wakeLock) wakeLock.release();
 
-    trackBtn.innerText="Start Ride";
-    trackBtn.classList.remove("stop");
+    await updateDoc(doc(db,"users",currentUser.uid),{bikeData});
+
+    btn.innerHTML = '<i class="fas fa-play"></i> Start Ride';
+    btn.classList.remove("btn-stop");
   }
 };
 
-// REFILL
-window.refill=()=>{
-  bikeData.lastFuelOdo=bikeData.totalOdo;
-  updateUI();
-  updateDoc(doc(db,"users",user.uid),{bikeData});
-};
+// 🔥 ALERT SYSTEM
+function checkAlert(){
+  const fuelLeft = bikeData.fuelLimit - (bikeData.totalOdo - bikeData.lastFuelOdo);
 
-// ELEMENTS
-const odo=document.getElementById("odo");
-const tripEl=document.getElementById("trip");
-const speedEl=document.getElementById("speed");
-const timeEl=document.getElementById("time");
-const fuel=document.getElementById("fuel");
-const trackBtn=document.getElementById("trackBtn");
-const appDiv=document.getElementById("app");
-
-// SW
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js');
+  if(fuelLeft < bikeData.fuelLimit * 0.2){
+    showNotification("⛽ Fuel Low!");
+  }
 }
-</script>
 
-</body>
-</html>
+function showNotification(msg){
+  if(Notification.permission === "granted"){
+    new Notification("MotoCare", { body: msg });
+  }
+}
+
+Notification.requestPermission();
+
+</script>
