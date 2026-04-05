@@ -1,168 +1,296 @@
-<!-- ONLY SCRIPT PART REPLACE (UI SAME থাকবে) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#00ffa3">
+    <title>Moto-Care Pro | PWA</title>
+    
+    <link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root { --bg: #0f1215; --card: #1c2227; --primary: #00ffa3; --red: #ff3d71; --dim: #9da5b1; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        #authScreen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .auth-card { background: var(--card); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 1px solid #2d363f; text-align: center; }
+        input, .iti { width: 100% !important; margin: 8px 0; }
+        input { padding: 14px; background: #2d363f; border: 1px solid #3d4752; border-radius: 12px; color: white; }
 
-<script type="module">
+        #mainApp { display: none; padding: 15px; max-width: 450px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 15px 20px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #2d363f; }
+        .odo-section { background: linear-gradient(145deg, #1c2227, #13181c); padding: 25px; border-radius: 25px; text-align: center; border-bottom: 4px solid var(--primary); margin-bottom: 20px; }
+        
+        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+        .btn-primary { background: linear-gradient(90deg, #00ffa3, #00d1ff); color: #000; }
+        .btn-stop { background: var(--red) !important; color: white !important; }
+        .btn-outline { background: none; border: 1px solid var(--primary); color: var(--primary); font-size: 13px; }
 
-// 🔥 ADD THIS (top এর দিকে)
-let saveTimer = null;
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .card { background: var(--card); padding: 18px 12px; border-radius: 20px; text-align: center; border: 1px solid #2d363f; }
+        
+        .bar-bg { background: #2d363f; height: 8px; border-radius: 10px; overflow: hidden; margin: 12px 0; }
+        .bar { height: 100%; transition: width 0.5s, background 0.5s; width: 0%; }
+        .bar-high { background: #00ffa3; }
+        .bar-mid { background: #ffb800; }
+        .bar-low { background: #ff3d71; }
+        @keyframes refill { 0% { width: 0%; } 100% { width: 100%; } }
+        .animate-refill { animation: refill 1s ease-out forwards; }
 
-// 🔥 LOCAL BACKUP
-function saveLocal(){
-  localStorage.setItem("bikeData", JSON.stringify(bikeData));
-}
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: var(--card); padding: 25px; border-radius: 25px; width: 100%; max-width: 380px; }
+    </style>
+</head>
+<body>
 
-function loadLocal(){
-  const data = localStorage.getItem("bikeData");
-  if(data) bikeData = JSON.parse(data);
-}
+    <section id="authScreen">
+        <div class="auth-card">
+            <i class="fas fa-motorcycle" style="font-size: 45px; color: var(--primary); margin-bottom: 15px;"></i>
+            <h2 id="authTitle" style="color:var(--primary)">Sign In</h2>
+            <div id="regFields" style="display: none;">
+                <input type="text" id="userName" placeholder="Full Name">
+                <input type="tel" id="userPhone">
+            </div>
+            <input type="email" id="userEmail" placeholder="Email Address">
+            <input type="password" id="userPass" placeholder="Password">
+            <button class="btn btn-primary" id="authBtn" onclick="handleAuth()">Login</button>
+            <button class="btn btn-outline" id="toggleAuth" onclick="toggleAuthMode()">Create New Account</button>
+        </div>
+    </section>
 
-// 🔥 AUTO SAVE
-function startAutoSave(){
-  saveTimer = setInterval(()=>{
-    if(currentUser){
-      updateDoc(doc(db,"users",currentUser.uid),{bikeData});
-      saveLocal();
-    }
-  },10000);
-}
+    <section id="mainApp">
+        <header class="header">
+            <div><h2 id="dispUserName">Hi, Rider</h2><p id="dispBike" style="margin:0; font-size:12px; color:var(--dim)">Loading...</p></div>
+            <div style="display:flex; gap:10px;">
+                <button style="background:#2d363f; color:#fff; border:none; width:40px; height:40px; border-radius:12px;" onclick="toggleModal('setupModal')"><i class="fas fa-cog"></i></button>
+                <button style="background:var(--red); color:#fff; border:none; width:40px; height:40px; border-radius:12px;" onclick="logout()"><i class="fas fa-power-off"></i></button>
+            </div>
+        </header>
 
-function stopAutoSave(){
-  clearInterval(saveTimer);
-}
+        <div class="odo-section">
+            <div style="font-size: 10px; color: var(--dim);">TOTAL ODOMETER</div>
+            <h1 id="mainOdo" style="font-size:48px; margin:10px 0;">0.0</h1>
+            <button class="btn-outline" style="margin:auto; padding:5px 15px; border-radius:8px;" onclick="editOdo()">Edit Odo</button>
+        </div>
 
-// 🔥 FIX AUTH (replace your handleAuth)
-window.handleAuth = async () => {
-  const email = document.getElementById('userEmail').value;
-  const pass = document.getElementById('userPass').value;
+        <button id="trackBtn" class="btn btn-primary" onclick="toggleTracking()"><i class="fas fa-play"></i> Start Ride</button>
 
-  if(!email || !pass){
-    alert("Email & Password required!");
-    return;
-  }
+        <div class="grid">
+            <div class="card">
+                <i class="fas fa-gas-pump"></i><div style="font-size:11px; margin-top:5px;">Fuel Range</div>
+                <div id="fuelVal" style="font-weight:bold; font-size:18px;">0 KM</div>
+                <div class="bar-bg"><div id="fuelBar" class="bar"></div></div>
+                <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('fuel')">Refill</button>
+            </div>
+            <div class="card">
+                <i class="fas fa-oil-can"></i><div style="font-size:11px; margin-top:5px;">Engine Oil</div>
+                <div id="oilVal" style="font-weight:bold; font-size:18px;">0 KM</div>
+                <div class="bar-bg"><div id="oilBar" class="bar"></div></div>
+                <button class="btn-outline" style="border:none; text-decoration:underline;" onclick="resetTask('oil')">Change</button>
+            </div>
+        </div>
+    </section>
 
-  try{
-    if(isLoginMode){
-      await signInWithEmailAndPassword(auth,email,pass);
-    }else{
-      const name = document.getElementById('userName').value;
-      const phone = iti.getNumber();
+    <div id="setupModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:var(--primary); margin-top:0;">Bike Setup</h3>
+            <input type="text" id="inBikeName" placeholder="Bike Name">
+            <input type="text" id="inBikePlate" placeholder="Plate Number">
+            <input type="number" id="inFuelLimit" placeholder="Fuel Limit (KM)">
+            <input type="number" id="inOilLimit" placeholder="Oil Limit (KM)">
+            <button class="btn btn-primary" onclick="saveBikeSetup()">Save</button>
+            <button class="btn btn-outline" onclick="toggleModal('setupModal')">Cancel</button>
+        </div>
+    </div>
 
-      if(!name || !phone){
-        alert("Fill all fields!");
-        return;
-      }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-      const res = await createUserWithEmailAndPassword(auth,email,pass);
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYP2X8KQaF-1S7IpMqSdQ6DKAbGZMoags",
+            authDomain: "moto-care-pro.firebaseapp.com",
+            projectId: "moto-care-pro",
+            storageBucket: "moto-care-pro.firebasestorage.app",
+            messagingSenderId: "621207883659",
+            appId: "1:621207883659:web:e1ba58f7aec638c5dca98e"
+        };
 
-      await setDoc(doc(db,"users",res.user.uid),{
-        name,
-        phone,
-        email,
-        country: iti.getSelectedCountryData().name,
-        bikeData
-      });
-    }
-  }catch(err){
-    alert(err.message);
-    console.error(err);
-  }
-};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-// 🔥 UPDATE AUTH STATE (small fix)
-onAuthStateChanged(auth, async user => {
-  if (user) {
-    currentUser = user;
+        const phoneInput = document.querySelector("#userPhone");
+        const iti = window.intlTelInput(phoneInput, {
+            initialCountry: "auto",
+            geoIpLookup: s => fetch("https://ipapi.co/json").then(r => r.json()).then(d => s(d.country_code)).catch(() => s("MY")),
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+        });
 
-    loadLocal(); // 🔥 NEW
+        let isLoginMode = true;
+        let currentUser = null;
+        let wakeLock = null;
+        let bikeData = { totalOdo: 0.0, fuelLimit: 150, oilLimit: 2000, lastFuelOdo: 0, lastOilOdo: 0, bikeName: "My Bike", bikePlate: "" };
 
-    document.getElementById('authScreen').style.display = "none";
-    document.getElementById('mainApp').style.display = "block";
+        window.toggleAuthMode = () => {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').innerText = isLoginMode ? "Sign In" : "Register";
+            document.getElementById('regFields').style.display = isLoginMode ? "none" : "block";
+            document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Sign Up";
+        };
 
-    const d = await getDoc(doc(db, "users", user.uid));
-    if(d.exists()){
-      const data = d.data();
-      bikeData = data.bikeData || bikeData;
-      updateUI();
-    }
-  } else {
-    document.getElementById('authScreen').style.display = "flex";
-    document.getElementById('mainApp').style.display = "none";
-  }
+        window.handleAuth = async () => {
+            const email = document.getElementById('userEmail').value;
+            const pass = document.getElementById('userPass').value;
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } else {
+                    const name = document.getElementById('userName').value;
+                    const phone = iti.getNumber();
+                    const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    await setDoc(doc(db, "users", res.user.uid), { name, phone, email, country: iti.getSelectedCountryData().name, bikeData });
+                }
+            } catch (err) { alert(err.message); }
+        };
+
+        onAuthStateChanged(auth, async user => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('authScreen').style.display = "none";
+                document.getElementById('mainApp').style.display = "block";
+                const d = await getDoc(doc(db, "users", user.uid));
+                if(d.exists()){
+                    const data = d.data();
+                    document.getElementById('dispUserName').innerText = "Hi, " + (data.name || "Rider").split(' ')[0];
+                    bikeData = data.bikeData || bikeData;
+                    updateUI();
+                }
+            } else {
+                document.getElementById('authScreen').style.display = "flex";
+                document.getElementById('mainApp').style.display = "none";
+            }
+        });
+
+        function updateUI() {
+            document.getElementById('mainOdo').innerText = bikeData.totalOdo.toFixed(1);
+            document.getElementById('dispBike').innerText = `${bikeData.bikeName} | ${bikeData.bikePlate}`;
+            updateProgress('fuel', bikeData.fuelLimit, bikeData.lastFuelOdo);
+            updateProgress('oil', bikeData.oilLimit, bikeData.lastOilOdo);
+        }
+
+        function updateProgress(type, limit, last) {
+            const left = Math.max(0, limit - (bikeData.totalOdo - last));
+            const pct = left / limit;
+            document.getElementById(`${type}Val`).innerText = left.toFixed(1) + " KM";
+            const bar = document.getElementById(`${type}Bar`);
+            bar.style.width = (pct * 100) + "%";
+            bar.className = "bar " + (pct > 0.5 ? "bar-high" : (pct > 0.2 ? "bar-mid" : "bar-low"));
+        }
+
+        let watchId = null;
+        let lastPos = null;
+        window.toggleTracking = async () => {
+            const btn = document.getElementById('trackBtn');
+            if(!watchId) {
+                if ('wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){} }
+                btn.innerHTML = '<i class="fas fa-stop"></i> Stop Ride';
+                btn.classList.add("btn-stop");
+                watchId = navigator.geolocation.watchPosition(pos => {
+                    if(lastPos) {
+                        const d = calcDist(lastPos.coords.latitude, lastPos.coords.longitude, pos.coords.latitude, pos.coords.longitude);
+                        if(d > 0.005) { bikeData.totalOdo += d; updateUI(); }
+                    }
+                    lastPos = pos;
+                }, null, { enableHighAccuracy: true, maximumAge: 0 });
+            } else {
+                btn.innerHTML = '<i class="fas fa-play"></i> Start Ride';
+                btn.classList.remove("btn-stop");
+                navigator.geolocation.clearWatch(watchId);
+                if(wakeLock) wakeLock.release();
+                watchId = null; lastPos = null;
+                await updateDoc(doc(db, "users", currentUser.uid), { bikeData });
+            }
+        };
+
+        function calcDist(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2-lat1)*Math.PI/180;
+            const dLon = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        window.resetTask = async (t) => {
+            if(confirm("Confirm Reset?")) {
+                document.getElementById(t+'Bar').classList.add('animate-refill');
+                if(t==='fuel') bikeData.lastFuelOdo = bikeData.totalOdo; else bikeData.lastOilOdo = bikeData.totalOdo;
+                await updateDoc(doc(db, "users", currentUser.uid), { bikeData });
+                setTimeout(() => { document.getElementById(t+'Bar').classList.remove('animate-refill'); updateUI(); }, 1000);
+            }
+        };
+
+        window.saveBikeSetup = async () => {
+            bikeData.bikeName = document.getElementById('inBikeName').value || bikeData.bikeName;
+            bikeData.bikePlate = document.getElementById('inBikePlate').value || bikeData.bikePlate;
+            bikeData.fuelLimit = parseFloat(document.getElementById('inFuelLimit').value) || 150;
+            bikeData.oilLimit = parseFloat(document.getElementById('inOilLimit').value) || 2000;
+            await setDoc(doc(db, "users", currentUser.uid), { bikeData }, { merge: true });
+            toggleModal('setupModal'); updateUI();
+        };
+
+        window.editOdo = async () => {
+            let n = prompt("Current Odometer:", bikeData.totalOdo);
+            if(n) { bikeData.totalOdo = parseFloat(n); updateUI(); await updateDoc(doc(db, "users", currentUser.uid), { bikeData });}
+        };
+
+        window.toggleModal = i => { const m = document.getElementById(i); m.style.display = (m.style.display==='flex'?'none':'flex'); };
+        window.logout = () => signOut(auth);
+
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+   let deferredPrompt;
+
+// ব্রাউজার যখন ইন্সটল করার জন্য প্রস্তুত হবে, তখন এই ইভেন্টটি কাজ করবে
+window.addEventListener('beforeinstallprompt', (e) => {
+    // ডিফল্ট পপ-আপ বন্ধ রাখা যাতে আমরা নিজেদের বাটন দেখাতে পারি
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // একটি কাস্টম পপ-আপ বা বাটন দেখান (যেমন স্ক্রিনের নিচে একটি বার)
+    showInstallBanner();
 });
 
-// 🔥 GPS OPTIMIZED TRACKING
-window.toggleTracking = async () => {
-  const btn = document.getElementById('trackBtn');
+function showInstallBanner() {
+    const banner = document.createElement('div');
+    banner.style = "position:fixed; bottom:20px; left:20px; right:20px; background:#1c2227; padding:15px; border-radius:15px; border:1px solid #00ffa3; display:flex; justify-content:space-between; align-items:center; z-index:9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);";
+    banner.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-motorcycle" style="color:#00ffa3; font-size:20px;"></i>
+            <span style="font-size:14px;">Install Moto-Care App?</span>
+        </div>
+        <button id="installBtn" style="background:#00ffa3; color:#000; border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer;">Install</button>
+    `;
+    document.body.appendChild(banner);
 
-  if(!watchId){
-
-    startAutoSave(); // 🔥 NEW
-
-    if ('wakeLock' in navigator) {
-      try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
-    }
-
-    btn.innerHTML = '<i class="fas fa-stop"></i> Stop Ride';
-    btn.classList.add("btn-stop");
-
-    watchId = navigator.geolocation.watchPosition(pos => {
-
-      if(lastPos){
-        const d = calcDist(
-          lastPos.coords.latitude,
-          lastPos.coords.longitude,
-          pos.coords.latitude,
-          pos.coords.longitude
-        );
-
-        if(d > 0.003){ // 🔥 better filter
-          bikeData.totalOdo += d;
-          updateUI();
-          saveLocal(); // 🔥 NEW
+    document.getElementById('installBtn').addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt(); // আসল ইন্সটল পপ-আপটি দেখাবে
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                console.log('User installed the app');
+            }
+            deferredPrompt = null;
+            banner.remove(); // ইন্সটল হয়ে গেলে আমাদের বাটনটি সরিয়ে ফেলবে
         }
-      }
-
-      lastPos = pos;
-
-    }, err => {
-      console.error(err);
-    }, {
-      enableHighAccuracy: false, // 🔥 battery save
-      maximumAge: 3000,
-      timeout: 10000
     });
-
-  } else {
-
-    stopAutoSave(); // 🔥 NEW
-
-    navigator.geolocation.clearWatch(watchId);
-    watchId = null;
-    lastPos = null;
-
-    if(wakeLock) wakeLock.release();
-
-    await updateDoc(doc(db,"users",currentUser.uid),{bikeData});
-
-    btn.innerHTML = '<i class="fas fa-play"></i> Start Ride';
-    btn.classList.remove("btn-stop");
-  }
-};
-
-// 🔥 ALERT SYSTEM
-function checkAlert(){
-  const fuelLeft = bikeData.fuelLimit - (bikeData.totalOdo - bikeData.lastFuelOdo);
-
-  if(fuelLeft < bikeData.fuelLimit * 0.2){
-    showNotification("⛽ Fuel Low!");
-  }
-}
-
-function showNotification(msg){
-  if(Notification.permission === "granted"){
-    new Notification("MotoCare", { body: msg });
-  }
-}
-
-Notification.requestPermission();
-
-</script>
+} </script>
+</body>
+</html>
