@@ -1,4 +1,4 @@
-const CACHE_NAME = 'motocare-v4';
+const CACHE_NAME = 'motocare-v5';
 
 // Static files (only essential)
 const STATIC_ASSETS = [
