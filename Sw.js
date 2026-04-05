@@ -1,67 +1,37 @@
 const CACHE_NAME = 'motocare-v5';
 
-// Static files (only essential)
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/Moto-Care-Tracker/',
+  '/Moto-Care-Tracker/index.html',
+  '/Moto-Care-Tracker/manifest.json'
 ];
 
-// Install
-self.addEventListener('install', (event) => {
+self.addEventListener('install', e => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(STATIC_ASSETS))
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
   );
 });
 
-// Activate (clean old caches)
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
+self.addEventListener('activate', e => {
+  e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      )
+      Promise.all(keys.map(k => k !== CACHE_NAME && caches.delete(k)))
     )
   );
   self.clients.claim();
 });
 
-// Fetch strategy
-self.addEventListener('fetch', (event) => {
-  const req = event.request;
+self.addEventListener('fetch', e => {
+  const req = e.request;
 
-  // 🚫 Skip Firebase / API calls (important)
   if (req.url.includes('firestore') || req.url.includes('googleapis')) {
     return;
   }
 
-  event.respondWith(
-    caches.match(req).then(cachedRes => {
-      if (cachedRes) return cachedRes;
-
-      return fetch(req)
-        .then(networkRes => {
-          // Only cache GET requests
-          if (req.method === 'GET') {
-            const cloned = networkRes.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(req, cloned);
-            });
-          }
-          return networkRes;
-        })
-        .catch(() => {
-          // Offline fallback
-          return caches.match('/index.html');
-        });
+  e.respondWith(
+    caches.match(req).then(res => {
+      return res || fetch(req).catch(() => caches.match('/Moto-Care-Tracker/index.html'));
     })
   );
 });
